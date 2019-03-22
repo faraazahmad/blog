@@ -57,23 +57,23 @@ paginate_path: 'page:num'
 # Navigation. If you do not like these modules, just remove them :D
 navs:
   -
-    href: /
+    href: /blog/
     label: Home
 
   -
-    href: /open-source
+    href: /blog/open-source
     label: Open-Source
 
   -
-    href: /blog
+    href: /blog/blog
     label: Blog
 
   -
-    href: /bookmark
+    href: /blog/bookmark
     label: Bookmark
 
   -
-    href: /about
+    href: /blog/about
     label: About
 
 # Sidebar to show popular repo
