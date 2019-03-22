@@ -85,6 +85,8 @@ analytics :
   google :
       tracking_id : 'tracking_id'  # ex. UA-72165600-X
 
+# permalink
+permalink: /blog
 
 # For about.html. Fell free to create your own!
 skill_software_keywords: [Java, C, C++, Qt, Python, MySQL, Oracle, SQLite, PL/SQL, Design Patterns]
