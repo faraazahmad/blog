@@ -1,95 +1,43 @@
 # Welcome to Jekyll!
 #
 # This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely need to edit after that.
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
 # For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: The Wheel # ex. I m Chuan
-name: Syed Faraaz Ahmad # ex. DONGChuan
-email: faraaz98@live.com
-location: New Delhi, India # ex. Nice, France
-company: # none
-company_url: # none
-github_url: https://github.com/faraazahmad/ # ex. https://github.com/DONGChuan
-github_username: faraazahmad # ex. DONGChuan
-description: description_of_your_web_site
-favicon: favicon.png # Image must be in assets/images
-repository: faraazahmad/faraazahmad.github.io/blog/ # ex. DONGChuan/DONGChuan.github.io
-
-# The base hostname & protocol for your site
-# For local test, please use http://localhost:4000
-# For production, use your github page url. ex. http://dongchuan.github.io
-url: https://faraazahmad.github.io/
-
-## Gem
-gems:
-  - jekyll-paginate
-  - jekyll-geo-pattern
-  - rouge
-  - kramdown
-  - jekyll-github-metadata
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+title: Your awesome title
+email: your-email@example.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Write an awesome description for your new site here. You can edit this
+  line in _config.yml. It will appear in your document head meta (for
+  Google search results) and in your feed.xml site description.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: jekyllrb
+github_username:  jekyll
 
 # Build settings
 markdown: kramdown
-highlighter: rouge
-lsi:         false
-excerpt_separator: "\n\n"
+theme: minima
+plugins:
+  - jekyll-feed
 
-source:      .
-destination: ./_site
-
-quiet:    false
-defaults: []
-
-kramdown:
-  input: GFM
-  enable_coderay: true
-
-# Disque
-disque: my_disque_settings # ex. httpdongchuangithubio.disqus.com
-
-# Pagination
-paginate: 10
-paginate_path: 'page:num'
-
-# Navigation. If you do not like these modules, just remove them :D
-navs:
-  -
-    href: /
-    label: Home
-
-  -
-    href: /open-source
-    label: Open-Source
-
-  -
-    href: /posts
-    label: Blog
-
-  -
-    href: /bookmark
-    label: Bookmark
-
-  -
-    href: /about
-    label: About
-
-# Sidebar to show popular repo
-side_bar_repo_limit: 5 # Number of repos to show
-
-# Google Analytics
-analytics :
-  provider : google
-  google :
-      tracking_id : 'tracking_id'  # ex. UA-72165600-X
-
-# permalink
-baseurl: /blog
-
-# For about.html. Fell free to create your own!
-skill_software_keywords: [Java, C, C++, Qt, Python, MySQL, Oracle, SQLite, PL/SQL, Design Patterns]
-skill_j2ee_keywords: [Spring, Struct, Hibernet, MyBatis, JSP]
-skill_web_keywords: [HTML, CSS, JS, JQuery, Ajax, AngularJS, NodeJS, ExpressJS, MongoDB, Redis, PHP, Symfony, Boostrap]
-skill_mobile_app_keywords: [Android, Sketch UI Desgin]
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list
+# to override the default setting.
+# exclude:
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
