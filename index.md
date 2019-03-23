@@ -4,3 +4,4 @@
 
 layout: home
 ---
+##  Hi, I'm Faraaz. I like to code and build things, and sometimes I write about it here.
