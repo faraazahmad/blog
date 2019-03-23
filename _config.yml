@@ -21,7 +21,7 @@ repository: faraazahmad/faraazahmad.github.io/blog/ # ex. DONGChuan/DONGChuan.gi
 # The base hostname & protocol for your site
 # For local test, please use http://localhost:4000
 # For production, use your github page url. ex. http://dongchuan.github.io
-url: https://faraazahmad.github.io/blog
+url: https://faraazahmad.github.io/
 
 ## Gem
 gems:
@@ -86,7 +86,7 @@ analytics :
       tracking_id : 'tracking_id'  # ex. UA-72165600-X
 
 # permalink
-permalink: /blog
+base_url: /blog
 
 # For about.html. Fell free to create your own!
 skill_software_keywords: [Java, C, C++, Qt, Python, MySQL, Oracle, SQLite, PL/SQL, Design Patterns]
