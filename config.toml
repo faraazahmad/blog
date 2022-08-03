@@ -1,0 +1,4 @@
+baseURL = "http://faraazahmad.github.io/blog"
+languageCode = "en-uk"
+theme = "PaperMod"
+title = "Faraaz's Blog"
