@@ -18,16 +18,16 @@ I've tried my hands at a couple of things:
 6. Worked at a couple early-stage startups.
 7. Tried all the text editors
 
-### Game development
+## Game development
 
-Like most people I know in tech, video games are what got them into computers. Somewhere along the way, I beleive 
+Like most people I know in tech, video games are what got them into computers. Somewhere along the way, I believe 
 every developer tries their hand at making a game. Maybe it was nostalgia, fun or the chance to recreate something
 like my favourite games, I knew I wanted to try building a game. 
 
 I searched for popular game engines, tried their tutorials, and started making games that were similar to the ones I
 enjoyed.
 
-{{<twitter 1561315727189356545>}}
+{{<twitter 1567601173276008450>}}
 
 Rookie mistake.
 
@@ -48,7 +48,7 @@ I did it too, guess what happened next.
 
 Oh well, maybe it wasn't for me.
 
-### Web development - focused individually on frontend, backend. Just settled for full-stack. (Rails ftw)
+## Web development
 
 Look, I've been fooling around with HTML/CSS since I was 9. 
 
@@ -57,14 +57,34 @@ I was there when the HTML5 and CSS3 launch was the big thing.
 I remember vividly that I had once stayed home from school because of a fever. When I felt slightly better, I 
 hopped onto https://w3schools.com to do a JavaScript quiz.
 
-I was obssessed with different website templates, all of their unique designs with CSS and their interativity using jQuery, It was the best thing ever. 
+![HTML5UP](html5up.png)
 
-This is probably also why I am usually confused when people say CSS is hard. You can code Djikstra's graph search algorithm but you don't know how CSS cascades? Get good.
+I was obssessed with different website templates, all of their unique designs with CSS and their interativity using
+jQuery. I used to download templates from [HTML5Up](https://html5up.net) and mess around with them all day, 
+it was the best thing ever. 
 
-Anyways, at the end of high school, I wanted to take my knowledge further in this area. I knew JS so I quickly got convonced by the _cult_ of thinking that you should have one language run everywhere. Nodejs had been out for a little while, so 
-there were libraries & frameworks like Express, Angular, Ember, etc. But all of it came with tons of manual configuration, and I was repulsed.
+This is probably also why I am usually confused when people say CSS is hard. You can code Djikstra's graph search 
+algorithm from scratch but you don't know how Cascading Style Sheets (CSS)... cascade? Please.
 
-Then I found out about **Ruby on Rails**, and **it was exactly what I needed**.
+Get good.
+
+Anyways, at the end of high school, I wanted to take my knowledge further in this area. I knew JS so I quickly got convonced by the _cult_ of running JS everywhere. Nodejs had been out for a little while, so there were libraries & frameworks like Express, Angular, Ember, etc. 
+But it didn't matter who made the tutorial, all of it came with tons of manual configuration. 
+
+I was repulsed.
+
+I just wanted something that didn't invlove setting up 10 tools before I can return a Hello World from an API endpoint.
+I searched around for something that didn't need so much **configuration**, which is probably what hit the right search 
+keywords. I stumbled upon Ruby on Rails, which (surprise, surprise) had the tagline of **"Convention over 
+Configuration"**. I just knew then, this is exactly what I need.
+
+The fact that you could just run 
+
+```
+rails generate scaffold Post title:string body:text
+```
+
+and it will generate a fully-functional (albeit basic) blogging app. It was pure bliss.
 
 * Tried to build an operating system.
 * I tried to build my own programming language.
