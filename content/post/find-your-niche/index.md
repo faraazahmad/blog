@@ -84,7 +84,31 @@ The fact that you could just run
 rails generate scaffold Post title:string body:text
 ```
 
-and it will generate a fully-functional (albeit basic) blogging app. It was pure bliss.
+and it generates a fully-functional (albeit basic) blogging app, that's pure bliss. Here's 
+[DHH](https://twitter.com/DHH) (Creator of Ruby on Rails) building and deploying a blog to production in a couple
+minutes.
+
+{{< rawhtml >}} 
+
+<video width=100% controls autoplay>
+    <source src="https://d1snj8sshb5u7m.cloudfront.net/Rails7.mp4" type="video/webm">
+    Your browser does not support the video tag.  
+</video>
+
+{{< /rawhtml >}}
+
+Learning Ruby on Rails really did kickstart my career in ways I would not have thought of, and I wouldn't have it any 
+other way. 
+
+You should check it for yourself at [their homepage](https://rubyonrails.org).
+
+## Systems development
+
+I built a lot of projects in the realm of web development, chat apps, todo lists, blogging plaatforms, code judge 
+platforms. But it was a lot of the same, sending requests back and forth to a web server. I wanted to do something
+a few levels _deeper_, something much closer to the metal.
+
+The lowest level thing I could find at the time was a tutorial to build an operating system kernel in Rust.
 
 * Tried to build an operating system.
 * I tried to build my own programming language.
