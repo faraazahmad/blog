@@ -66,16 +66,18 @@ it was the best thing ever.
 This is probably also why I am usually confused when people say CSS is hard. You can code Djikstra's graph search 
 algorithm from scratch but you don't know how Cascading Style Sheets (CSS)... cascade? Please.
 
-Get good.
+**Learn your tools.**
 
-Anyways, at the end of high school, I wanted to take my knowledge further in this area. I knew JS so I quickly got convonced by the _cult_ of running JS everywhere. Nodejs had been out for a little while, so there were libraries & frameworks like Express, Angular, Ember, etc. 
-But it didn't matter who made the tutorial, all of it came with tons of manual configuration. 
+Anyways, at the end of high school, I wanted to take my knowledge further in this area. I already knew a bit of
+JavaScript, so I didn't need much convincing to be intrigued by Nodejs. Nodejs had been out for a while, so there were
+more than enough libraries & frameworks like Express, Angular, Ember, etc. But it didn't matter who made the tutorial, 
+all of it came with tons of manual configuration. 
 
-I was repulsed.
+**It was too much configuration, I was repulsed.**
 
-I just wanted something that didn't invlove setting up 10 tools before I can return a Hello World from an API endpoint.
-I searched around for something that didn't need so much **configuration**, which is probably what hit the right search 
-keywords. I stumbled upon Ruby on Rails, which (surprise, surprise) had the tagline of **"Convention over 
+I just wanted to build stuff, I wasn't interested in setting up 10 tools before I can return a Hello World from an API
+endpoint. I searched around for something that didn't need so much **configuration**, which is probably what hit the 
+right search keywords. I stumbled upon Ruby on Rails, which (surprise, surprise) had the tagline of **"Convention over 
 Configuration"**. I just knew then, this is exactly what I need.
 
 The fact that you could just run 
@@ -90,7 +92,7 @@ minutes.
 
 {{< rawhtml >}} 
 
-<video width=100% controls autoplay>
+<video width=100% controls>
     <source src="https://d1snj8sshb5u7m.cloudfront.net/Rails7.mp4" type="video/webm">
     Your browser does not support the video tag.  
 </video>
@@ -104,14 +106,50 @@ You should check it for yourself at [their homepage](https://rubyonrails.org).
 
 ## Systems development
 
-I built a lot of projects in the realm of web development, chat apps, todo lists, blogging plaatforms, code judge 
-platforms. But it was a lot of the same, sending requests back and forth to a web server. I wanted to do something
-a few levels _deeper_, something much closer to the metal.
+I built a lot of projects in the realm of web development -- chat apps, todo lists, blogging platforms, code judge 
+platforms. But it was a lot of the same, sending requests back and forth to a web server, with a only slightly different 
+flavor each time. I wanted to do something a few levels _deeper_.
 
-The lowest level thing I could find at the time was a tutorial to build an operating system kernel in Rust.
+**Something much closer to the metal.**
 
-* Tried to build an operating system.
-* I tried to build my own programming language.
+Well, what is closer to the metal than an operating system? I don't remember how but I found a tutorial for building
+and operating system in Rust. What more could one ask for? So I went over to https://intermezzos.github.io/ and got 
+cracking. It involved writing a bootloader in x86 Assembly, booting into "real mode", making the jump to "Long Mode" 
+where the real work begins. The intermezzos tutorial seemed incomplete, but thankfully they mention that it's based on 
+https://os.phil-opp.com, so I went over there and got into a lot more things:
+
+Managing exceptions, double faults (exceptions while handling exceptions), dealing with hardware interrupts, managing
+memory, allocating the heap,.... And it goes on.
+
+It looked something like this:
+![OS GIF](https://os.phil-opp.com/hardware-interrupts/qemu-hardware-timer-dots.gif)
+
+**But this time it was exciting, not overwhelming.**
+
+It seemed like a signal that I enjoy working on things that are adjacent, not necessarily the same to operating systems.
+This was around the time that COVID hit, and yet again I found myself wanting to work on something interesting again.
+I don't remember why but I decided to build my own programming language, HOW HARD COULD IT REALLY BE?!
+
+![Tisp blog post](tisp.png)
+
+I eventually found out, wrote a 
+[blog post about it](https://dev.to/faraazahmad/i-was-bored-so-i-built-my-own-programming-language-30f1), and boy did it
+do numbers.
+
+This helped me narrow my interests in systems development, helped me find a job where I don't hate every second of it.
+Helped me find like-minded people, people who were interested in the same things I was, people who helped me be a 
+better engineer. 
+
+I started speaking at technical conferences, local meetups. Met a lot of amazing people in the industry, and it 
+snowballed from there.
+
+## Epilogue
+
+None of this is linear, there will be setbacks. Sometimes more setbacks than anything, but you gotta make sure the 
+slope trends upwards, little by little.
+
+People overestimate how much they can do in 6 months, and underestimate how much they can do in 6 years.
+
 * Worked in a massive-size org, worked in a couple early stage startups.
 * Worked as a contractor, got familiar with such an environment.
 * I've attempted to start my own business, none of them took off. The last one had promise but I just didn't feel it
