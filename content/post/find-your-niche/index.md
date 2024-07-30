@@ -4,49 +4,54 @@ date: 2024-06-10T20:11:27+05:30
 tags: ['career', 'life']
 ---
 
-I've been wanting to write this blog post for a few years, but I've never had the right kind of experience to justify 
-it. You see, over the past couple of years I have been trying to explore areas in software development that 
-fascinate me.
+> You can't connect the dots looking forward; you can only connect them looking backwards. So you have to trust that 
+>the dots will somehow connect in your future. You have to trust in something - your gut, destiny, life, karma, whatever
+>. This approach has never let me down, and it has made all the difference in my life.
+>
+>-- Steve Jobs
 
-I've tried my hands at a couple of things:
+I've been wanting to write this blog post for a few years now, but I've never had the right kind of experience to 
+convince myself that I'm the right person to do so. 
 
-1. Game development
-2. Web development
-3. Tried to build an OS kernel
-4. Built a programming language
-5. Worked at a massive org.
-6. Worked at a couple early-stage startups.
-7. Tried all the text editors
+You see, I've been interested in computers for as long as I can remember.
+It started off with playing video games, entering cheat codes in Grand Theft Auto, editing the config files in games
+to mess around with them, downloading website templates and messing up the CSS, it goes on. So when high school ended 
+it was pretty clear to me that I wanted to do something with software, I just didn't know what. 
+
+So, over the past couple of years I have been trying to explore areas in software development that fascinate me. Here
+are some things I have tried and I think you should too:
 
 ## Game development
 
 Like most people I know in tech, video games are what got them into computers. Somewhere along the way, I believe 
 every developer tries their hand at making a game. Maybe it was nostalgia, fun or the chance to recreate something
-like my favourite games, I knew I wanted to try building a game. 
+like my favourite games, I knew I wanted to try building my own game. 
 
-I searched for popular game engines, tried their tutorials, and started making games that were similar to the ones I
-enjoyed.
+I searched for popular game engines, tried their tutorials, and after lots of trying and failing I settled on Godot. I 
+started making games that were similar to the ones I enjoyed as a kid -- Grand Theft Auto, FIFA, Need For Speed, Prince
+of Persia.
+
+**Rookie mistake.**
+
+While developing a game you need to design characters, write code, write a story, implement animations, interactions,
+inventory, music, sound effects, A/B testing with real beta testers, market your game
+
+and it is... everything.
+
+Your first game should probably be tic-tac-toe, or pacman or something similar. It should be extremely simple to
+implement, and be a safe space for you to learn your game dev environment.
 
 {{<twitter 1567601173276008450>}}
 
-Rookie mistake.
-
-While developing a game you need to write code, write a story, implement character animations, interactions,
-inventory, music, sound effects, A/B test your game, market your game...
-
-and it is, everything.
-
-Your first game should probably be tic-tac-toe, or pacman or something similar. It should be extremely simple to
-implement, and a safe space for you to learn your game dev environment.
-
 You only make your life worse by starting out with a game that has a massive scope. There's a reason that even massive
-game studios with all the budget and expertise require their employees to undergo "crunch periods". Most people start
+game studios with all the budget and expertise in the world, require their employees to undergo "crunch periods" (Where they work on
+the games non-stop, sleep in their offices, and don't see their families for weeks). Most people start
 out learning game-dev with these massive ideas they have for games, and they burn out trying to learn and build 
 everything.
 
-I did it too, guess what happened next.
+I did it too, guess what happened next!
 
-Oh well, maybe it wasn't for me.
+Oh well, onto the next thing.
 
 ## Web development
 
@@ -145,22 +150,22 @@ snowballed from there.
 
 ## Epilogue
 
-None of this is linear, there will be setbacks. Sometimes more setbacks than anything, but you gotta make sure the 
+None of this is linear, there will be setbacks. Sometimes more setbacks than progress, but you gotta make sure the 
 slope trends upwards, little by little.
 
 People overestimate how much they can do in 6 months, and underestimate how much they can do in 6 years.
 
-* Worked in a massive-size org, worked in a couple early stage startups.
-* Worked as a contractor, got familiar with such an environment.
-* I've attempted to start my own business, none of them took off. The last one had promise but I just didn't feel it
-was the right niche for me to work in.
-* I tried different IDEs and text editors. Eclipse, intelliJ IDEA, Visual Studio, SublimeText, VSCode, Emacs, Vim,
-Helix, Zed.
-* Talk about the book Range by David Epstein. Give Tiger Woods example, then Roger Federer example.
-* By no means am I an expert in everything, but you don't need to be. You just need to acquire the worldview of that 
-community.
+Expose yourself to different experiences. Work at a massive organization, join a startup, or start your own. 
+Go to conferences, be a speaker, "fail" in front of everyone, what's the worst that could happen? Let it happen. You'll
+come out better on the other side.
+
+{{<twitter 1655237300933230593>}}
+
+People with a wide range of experiences are more likely to do well in life, you don't have to specialize too soon. You
+see it all and eventually make informed judgements on what you want to focus on. You don't need to be an expert on 
+everything you do, but atleast make the effort to learn how deep the rabbit hole goes.
 
 
-you're gonna make it.
+Trust me, you're gonna make it.
 
-{{< youtube mJwqCaMc8ik >}}
+{{< youtube B6lBtiQZSho >}}
