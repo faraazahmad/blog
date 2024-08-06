@@ -14,12 +14,19 @@ I've been wanting to write this blog post for a few years now, but I've never ha
 convince myself that I'm the right person to do so. 
 
 You see, I've been interested in computers for as long as I can remember.
-It started off with playing video games, entering cheat codes in Grand Theft Auto, editing the config files in games
-to mess around with them, downloading website templates and messing up the CSS, it goes on. So when high school ended 
-it was pretty clear to me that I wanted to do something with software, I just didn't know what. 
+It started off with playing video games, entering cheat codes in Grand Theft Auto, editing the config files to flip
+the game mechanics, downloading website templates and messing up the CSS, trying to build my own operating system, 
+it goes on. So when high school ended, it was pretty clear to me that **I wanted to do something with software, I just 
+didn't know what.**
 
-So, over the past couple of years I have been trying to explore areas in software development that fascinate me. Here
-are some things I have tried and I think you should too:
+I've heard a lot of other folks have this problem too, especially younger developers. Given the advancement of tech
+in the last 10 years, combined with massive proliferation of tech stacks, I believe the opportunity costs are higher than 
+ever, which leads to a lot of anxiety and FOMO. I have wrestled with this issue for quite a while, and I don't know if
+the FOMO ever goes away, but you can definitely reduce it by trying out the things you are interested in, and trust that
+the dots will somehow connect in the future.
+
+So, over the past couple of years that is what I've been trying to do -- explore different areas in software development
+that fascinate me -- These are most of the things I have tried, and how I went about doing so.
 
 ## Game development
 
