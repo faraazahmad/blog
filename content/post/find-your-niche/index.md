@@ -30,13 +30,30 @@ that fascinate me -- These are most of the things I have tried, and how I went a
 
 ## Game development
 
-Like most people I know in tech, video games are what got them into computers. Somewhere along the way, I believe 
-every developer tries their hand at making a game. Maybe it was nostalgia, fun or the chance to recreate something
-like my favourite games, I knew I wanted to try building my own game. 
+Like most people I know in tech, video games are what got me into computers. Somewhere along the way, I believe 
+every developer tries their hand at making a game. Maybe you see your favourite game developers as heroes and just want
+to be like them, maybe it is nostalgia that makes you want to recreate the video games you grew up with, or maybe you're
+so deep into sci-fi that you want to turn your wild imagination into a real tangible video game. For me, it was all of
+the above, **I just knew I wanted to build my own game.**
 
-I searched for popular game engines, tried their tutorials, and after lots of trying and failing I settled on Godot. I 
-started making games that were similar to the ones I enjoyed as a kid -- Grand Theft Auto, FIFA, Need For Speed, Prince
-of Persia.
+I searched for popular game engines, three of them stood out: Unity, Unreal Engine, and Godot. Unity and Unreal are
+very widely used professionally and so have the most educational content. They also have royalty fees for when your game
+starts doing really well financially, but I wasn't going to reach that scale so that wasn't a concern for me.
+
+I really liked Unity given thats its very approachable for beginners, but the editor kept freezing and crashing every now and then. That 
+was a huge turnoff for me since I value prototyping speed very highly. I also tried Unreal Engine, it had some really 
+good features for building high-quality visuals, and has since made them 10x better ([Nanite](https://dev.epicgames.com/documentation/en-us/unreal-engine/nanite-virtualized-geometry-in-unreal-engine) and [Lumen](https://dev.epicgames.com/documentation/en-us/unreal-engine/lumen-global-illumination-and-reflections-in-unreal-engine)), but it's visual scripting system called Blueprints felt really cumbersome. You _CAN_ use C++ in Unreal Engine 
+but it seemed like they were really aggressively pushing Blueprints as a first-class citizen, and as someone who wanted 
+to write code to build games this was a huge turnoff.
+
+![Unreal Engine blueprints](https://d1iv7db44yhgxn.cloudfront.net/documentation/images/d327d265-5ed4-45a1-b7a8-ca5c0c47d7de/bpqs_6_step6.png)
+
+#### Enter Godot
+
+Godot is a fully open-sourced (MIT licensed) and free game-engine is lightweight on your machine and really easy to use.
+
+![Godot Engine features page](godot.png)
+
 
 **Rookie mistake.**
 
