@@ -10,14 +10,14 @@ tags: ['career', 'life']
 >
 >-- Steve Jobs
 
-I've been wanting to write this blog post for a few years now, but I've never had the right kind of experience to 
+I've been wanting to write this blog post for a few years now, but I've never had the kind of experience to 
 convince myself that I'm the right person to do so. 
 
 You see, I've been interested in computers for as long as I can remember.
-It started off with playing video games, entering cheat codes in Grand Theft Auto, editing the config files to flip
-the game mechanics, downloading website templates and messing up the CSS, trying to build my own operating system, 
-it goes on. So when high school ended, it was pretty clear to me that **I wanted to do something with software, I just 
-didn't know what.**
+It started off with playing video games, quickly entering cheat codes in Grand Theft Auto to try and break the engine, 
+editing the config files to flip the game mechanics, downloading website templates and messing up the CSS, trying to 
+build my own operating system, my own video games, it goes on. So when high school ended, it was pretty clear to me 
+that **I wanted to do something with software, I just didn't know what.**
 
 I've heard a lot of other folks have this problem too, especially younger developers. Given the advancement of tech
 in the last 10 years, combined with massive proliferation of tech stacks, I believe the opportunity costs are higher than 
@@ -26,7 +26,7 @@ the FOMO ever goes away, but you can definitely reduce it by trying out the thin
 the dots will somehow connect in the future.
 
 So, over the past couple of years that is what I've been trying to do -- explore different areas in software development
-that fascinate me -- These are most of the things I have tried, and how I went about doing so.
+that fascinate me. These are most of the things I have tried, and how I went about doing so.
 
 ## Game development
 
@@ -34,10 +34,10 @@ Like most people I know in tech, video games are what got me into computers. Som
 every developer tries their hand at making a game. Maybe you see your favourite game developers as heroes and just want
 to be like them, maybe it is nostalgia that makes you want to recreate the video games you grew up with, or maybe you're
 so deep into sci-fi that you want to turn your wild imagination into a real tangible video game. For me, it was all of
-the above, **I just knew I wanted to build my own game.**
+the above, **I just knew I wanted to build my own game.** (Or atleast learn how to)
 
 I searched for popular game engines, three of them stood out: Unity, Unreal Engine, and Godot. Unity and Unreal are
-very widely used professionally and so have the most educational content. They also have royalty fees for when your game
+very widely used professionally and have the most amount of educational content. They also have royalty fees for when your game
 starts doing really well financially, but I wasn't going to reach that scale so that wasn't a concern for me.
 
 I really liked Unity given thats its very approachable for beginners, but the editor kept freezing and crashing every now and then. That 
@@ -50,10 +50,15 @@ to write code to build games this was a huge turnoff.
 
 #### Enter Godot
 
-Godot is a fully open-sourced (MIT licensed) and free game-engine is lightweight on your machine and really easy to use.
+Godot is a fully open-sourced (MIT licensed) and free game-engine that is lightweight on your machine and easy to use.
+Its interface is very similar to that of Unity, and has a scripting language that is basically python, making it very 
+easy to get started with. It's completely free forever -- no  strings attached -- but if you find value in it, I 
+recommend you to make atleast a small donation as its development is completely open sourced.
 
 ![Godot Engine features page](godot.png)
 
+Initially while using Unity and even after it, I started off by trying to make a AAA game -- 3D, high graphical detail, 
+third person shooter, open world, character interactions, player inventory with animations -- the whole nine yards.
 
 **Rookie mistake.**
 
@@ -83,12 +88,12 @@ Look, I've been fooling around with HTML/CSS since I was 9.
 
 I was there when the HTML5 and CSS3 launch was the big thing.
 
-I remember vividly that I had once stayed home from school because of a fever. When I felt slightly better, I 
+I remember vividly that I had once stayed home from school because of a fever. When I felt slightly better, I'd
 hopped onto https://w3schools.com to do a JavaScript quiz.
 
 ![HTML5UP](html5up.png)
 
-I was obssessed with different website templates, all of their unique designs with CSS and their interativity using
+I was obssessed with different website templates, all of their unique designs with CSS and their interactivity using
 jQuery. I used to download templates from [HTML5Up](https://html5up.net) and mess around with them all day, 
 it was the best thing ever. 
 
@@ -98,16 +103,16 @@ algorithm from scratch but you don't know how Cascading Style Sheets (CSS)... ca
 **Learn your tools.**
 
 Anyways, at the end of high school, I wanted to take my knowledge further in this area. I already knew a bit of
-JavaScript, so I didn't need much convincing to be intrigued by Nodejs. Nodejs had been out for a while, so there were
-more than enough libraries & frameworks like Express, Angular, Ember, etc. But it didn't matter who made the tutorial, 
-all of it came with tons of manual configuration. 
+JavaScript, so I didn't need much convincing to try out Nodejs. It had been out for a while, so there were
+more than enough libraries & frameworks like Express, Knowckout.js, AngularJS, Ember, etc. But it didn't matter who 
+made the tutorial, all of it came with tons of manual configuration. 
 
 **It was too much configuration, I was repulsed.**
 
 I just wanted to build stuff, I wasn't interested in setting up 10 tools before I can return a Hello World from an API
 endpoint. I searched around for something that didn't need so much **configuration**, which is probably what hit the 
 right search keywords. I stumbled upon Ruby on Rails, which (surprise, surprise) had the tagline of **"Convention over 
-Configuration"**. I just knew then, this is exactly what I need.
+Configuration"**. I knew just then, this is exactly what I need.
 
 The fact that you could just run 
 
@@ -115,7 +120,7 @@ The fact that you could just run
 rails generate scaffold Post title:string body:text
 ```
 
-and it generates a fully-functional (albeit basic) blogging app, that's pure bliss. Here's 
+and it generates a fully-functional (albeit basic) blogging app, was pure bliss. Here's 
 [DHH](https://twitter.com/DHH) (Creator of Ruby on Rails) building and deploying a blog to production in a couple
 minutes.
 
@@ -136,8 +141,8 @@ You should check it for yourself at [their homepage](https://rubyonrails.org).
 ## Systems development
 
 I built a lot of projects in the realm of web development -- chat apps, todo lists, blogging platforms, code judge 
-platforms. But it was a lot of the same, sending requests back and forth to a web server, with a only slightly different 
-flavor each time. I wanted to do something a few levels _deeper_.
+platforms. But it was a lot of the same, sending requests back and forth to a web server, with only a slightly different 
+flavor each time. I wanted to do something dfferent, something a few levels _deeper_.
 
 **Something much closer to the metal.**
 
@@ -155,7 +160,7 @@ It looked something like this:
 
 **But this time it was exciting, not overwhelming.**
 
-It seemed like a signal that I enjoy working on things that are adjacent, not necessarily the same to operating systems.
+It seemed like a signal that I enjoy working on things that are around the same level of hardware abstraction as operating systems.
 This was around the time that COVID hit, and yet again I found myself wanting to work on something interesting again.
 I don't remember why but I decided to build my own programming language, HOW HARD COULD IT REALLY BE?!
 
@@ -174,16 +179,17 @@ snowballed from there.
 
 ## Epilogue
 
-None of this is linear, there will be setbacks. Sometimes more setbacks than progress, but you gotta make sure the 
-slope trends upwards, little by little.
+None of this is linear, upwards progress; there will be setbacks. Sometimes more setbacks than progress, but you gotta 
+make sure the slope trends upwards, little by little.
 
-People overestimate how much they can do in 6 months, and underestimate how much they can do in 6 years.
+You've got to try and do a little bit every day, it doesn't have to be some game-changing, world shattering progress, it
+just has to be. People overestimate how much they can do in 6 months, and underestimate how much they can do in 6 years.
 
 Expose yourself to different experiences. Work at a massive organization, join a startup, or start your own. 
-Go to conferences, be a speaker, "fail" in front of everyone, what's the worst that could happen? Let it happen. You'll
+Go to tech meetups/conferences, be a speaker, "fail" in front of everyone, what's the worst that could happen? Let it happen. You'll
 come out better on the other side.
 
-{{<twitter 1655237300933230593>}}
+![Build Shit](build-shit.png)
 
 People with a wide range of experiences are more likely to do well in life, you don't have to specialize too soon. You
 see it all and eventually make informed judgements on what you want to focus on. You don't need to be an expert on 
