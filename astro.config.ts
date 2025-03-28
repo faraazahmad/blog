@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config'
+import { defineConfig, passthroughImageService } from 'astro/config'
 
 import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
@@ -22,6 +22,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://faraazahmad.github.io/blog',
+  image: { service: passthroughImageService() },
   integrations: [
     expressiveCode({
       themes: ['github-light', 'github-dark'],
