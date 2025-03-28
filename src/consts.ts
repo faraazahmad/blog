@@ -12,11 +12,11 @@ export const SITE: Site = {
 
 export const NAV_LINKS: SocialLink[] = [
   {
-    href: '/blog',
+    href: '/blog/blog',
     label: 'blog',
   },
   {
-    href: '/authors',
+    href: '/blog/authors',
     label: 'authors',
   },
 ]
