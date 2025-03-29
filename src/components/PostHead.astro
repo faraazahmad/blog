@@ -10,7 +10,7 @@ const { post } = Astro.props
 
 const title = post.data.title || SITE.title
 const description = post.data.description || SITE.description
-const image = new URL(`/${post.id}.png`, Astro.site)
+const imgSrc = `${SITE.href}${post?.data?.image?.src}`.replace('blog/blog', 'blog');
 ---
 
 <title>{`${title} | ${SITE.title}`}</title>
@@ -22,7 +22,7 @@ const image = new URL(`/${post.id}.png`, Astro.site)
 <meta property="og:description" content={description} />
 <meta
   property="og:image"
-  content={`${SITE.href}${post?.data?.image?.src}` || image}
+  content={imgSrc}
 />
 <meta property="og:image:alt" content={title} />
 <meta property="og:type" content="website" />
@@ -34,7 +34,7 @@ const image = new URL(`/${post.id}.png`, Astro.site)
 <meta name="twitter:description" content={description} />
 <meta
   property="twitter:image"
-  content={image}
+  content={imgSrc}
 />
 <meta name="twitter:image:alt" content={title} />
 <meta name="twitter:card" content="summary_large_image" />
