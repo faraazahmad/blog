@@ -3,7 +3,7 @@ title: "There's too much content, so I built an AI knowledge assistant."
 description: 'How and why I built an AI assistant that lets me consume or discard content much quicker.'
 date: 2025-03-29
 tags: ['ai', 'knowledge']
-image: 'kai_screenshot.png'
+image: 'knowledge_wizard.png'
 authors: ['faraaz']
 ---
 
@@ -23,14 +23,34 @@ Did you know there are articles people write just so they can rank higher in sea
 
 You know what the worst part is about generative AI? People used to take hours to write SEO articles, but now? You feed a couple keywords to an LLM and it churns out BS articles by the minute.
 
-## There ARE diamonds to be found
+## There *are* diamonds to be found
 
 Not everything is terrible though, there are some really amazing, well-researched resources on a lot of topics.
 
 > 20 research papers, 50 videos and a 100 articles to choose from.
 
-It's totally possible that all of this is quality content, and you want to go read it all. But alas, the average human only lives for so long. If you spend all your time just gaining knowledge, there would not be much time left to take action based on it. It's not the end of the world if you try and get some help to consume all this knowledge. You know what Large Language Models are really good at? Summarizing oceans of text -- structured or otherwise.
+It's totally possible that all of this is quality content, and you want to go read it all. But alas, the average human only lives for so long. If you spend all your time just gaining knowledge, there wouldn't be much left to take action. It's not the end of the world if you try and get some help to consume all this knowledge. You know what Large Language Models are really good at? Summarizing oceans of text -- structured or otherwise.
 
-## Not all doom and gloom
+## AI for good
 
-## Filtering through AI with AI
+What if, instead of using AI to create uncanny art -- based on questionable methods of training, you used it to help you consume more knowledge quicker. This is exactly what I set out to do.
+
+You see, my YouTube _Watch Later_ list has 600+ videos. I can't possibly watch all of them, so I made AI do it. Previously it would've sat in my list for months, after which I either forget about it or I force myself to watch it. Either way, is not a great experience for me.
+
+![Indexes in Distributed databases](indexes_in_dist_db.png)
+
+Instead, I get the transcript of the video and send it to an LLM, asking it to provide me a list of 10 most important points and their timestamps in the video. And for good measure, I get the LLM to categorize the video as well, with 3 separate tags, so that it can be grouped later with similar content. Then I can take one glance at the summary, skim through the video in my first watch. If I find it interesting, I will watch it completely, else I discard it from my list.
+
+> Game, set, match.
+
+The same goes for academic papers, since they can very lengthy and information dense. It's better to know as early as possible if I want to spend my time reading a certain paper. Ofcourse I can add my own notes to the submission too.
+
+![Raft](raft.png)
+
+## Under the hood
+
+The arhitecture for this is fairly simple. 
+
+![Kai architecture](kai_architecture.png)
+
+## Closing thoughts
