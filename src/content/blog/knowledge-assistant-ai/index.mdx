@@ -49,8 +49,40 @@ The same goes for academic papers, since they can very lengthy and information d
 
 ## Under the hood
 
-The arhitecture for this is fairly simple. 
+The arhitecture for this is fairly simple:
 
 ![Kai architecture](kai_architecture.png)
+
+The user only ever interacts with the Rails app, managing submissions and asssociated notes. The Rails app creates background jobs that communicate with the FastAPI server which runs as a _sidecar_. This server was used because Mistral provided a Python SDK which was really simple to use. You could technically remove the sidecar server by directly making API calls to the Mistral's REST API but that would require writing a lot of boilerplate, which I don't want.
+
+I specifically chose Mistral because of their much improved [Document OCR capabilities recently](https://mistral.ai/news/mistral-ocr) and the fact that they provide an Experimental tier that you can use for free.
+
+The prompts used with the LLMs are fairly straightforward as well, here's the prompt I used to get the most important points from the video transcript.
+
+```python
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "Give me the 10 most important points from the text. Return the result as an array in a json string."
+            },
+            {
+                "type": "text",
+                "text": transcript_text
+            }
+        ]
+    }
+]
+chat_response = client.chat.complete(
+    model="mistral-large-latest",
+    messages=messages
+)
+```
+
+Note that I use `mistral-large` for dealing with tasks that need to understand the text and infer what might be the most important points. This gives me satisfactory results thanks to its [123 Billion parameter model](https://mistral.ai/news/mistral-large-2407).
+
+![Mistral Models](mistral-models.png)
 
 ## Closing thoughts
