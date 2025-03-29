@@ -10,7 +10,7 @@ const { post } = Astro.props
 
 const title = post.data.title || SITE.title
 const description = post.data.description || SITE.description
-const image = new URL(`/static/${post.id}.png`, Astro.site)
+const image = new URL('/1200x630.png', Astro.site)
 ---
 
 <title>{`${title} | ${SITE.title}`}</title>
