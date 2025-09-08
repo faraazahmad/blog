@@ -293,10 +293,11 @@ function third() {
 
 If you parse this file into its tree representation and create a call graph for the functions it would look something like this:
 
-```mermaid
-graph LR
-    A[first] --> B[second]
-    B --> C[third]
+
+```
+|----------|      |----------|      |----------|
+|   First  |----->|  Second  |----->|  Third   |
+|----------|      |----------|      |----------|
 ```
 
 That is what I did, and stored it in a graph database (Neo4j). Now I can easily get all the call paths that lead to a
