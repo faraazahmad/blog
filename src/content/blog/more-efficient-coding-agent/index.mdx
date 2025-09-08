@@ -230,6 +230,8 @@ The generated embeddings are then stored alongside other function metadata in a 
 | `getEnvVars` | `[-0.1357, 0.9876, -0.2468, ...]` |
 | `reportError` | `[0.6543, -0.1234, 0.8765, ...]` |
 
+**Table 2:** Generated embeddings of functions' summaries
+
 Now say you want a function that "parses function defintions", you take this phrase and create a vector embedding for it.
 Using the `pgvector` extension in your PostgreSQL DB, you can run a query:
 
@@ -252,6 +254,8 @@ and out pops a result that looks something like this:
 | `indexFiles` | 0.6891 |
 | `getEnvVars` | 0.5423 |
 | `reportError` | 0.4567 |
+
+**Table 3:** Sorting functions based on cosine similarity to the search query
 
 My reaction when I first saw this result:
 
@@ -315,13 +319,10 @@ Efficiency indeed.
 
 Alright then. I've been waxing lyrical about being so much more efficient than just raw LLMs, but how much more efficient is it?
 
-A lot of problems have already been solved in computer science. Using LLMs for everything is like replacing a forklift with a swiss
-army knife -- a lot more general purpose and appealing -- but a lot less efficient.
-
-My aim for this project was to reduce the amount of tokens being used for tasks that can be trivially soved by applying just a little
+A lot of problems have already been solved in computer science. Using LLMs for everything is like replacing a forklift with a swiss army knife -- a lot more general purpose and appealing -- but a lot less powerful. My aim for this project was to reduce the amount of tokens being used for tasks that can be trivially soved by applying just a little
 bit of computer science knowhow.
 
-Linked below are a couple of rough benchmarks I did by comparing the methods I've just described with Zed editor's coding agent.
+Linked below are a couple of rough benchmarks I performed by comparing the methods I've just described using Zed editor's coding agent.
 I added these optimisations to an MCP server and exposed that to the agent. All the benchmarks compare the amount of tokens used
 with and without the MCP.
 
@@ -335,6 +336,8 @@ coding agent.
 | Get all functions that manage state. | 47k [(Context window)](https://gist.github.com/faraazahmad/652830ed08bc0ac25aec56915c9658ec) |  22.8k [(Context window)](https://gist.github.com/faraazahmad/6d7bc44067596429fe73d630e5edb141) | 54%  |
 | Which functions handle template expression parsing? | 22k [(Context window)](https://gist.github.com/faraazahmad/9df86ed5bd6f70ef0d6602101d47d22d) | 15.5k [(Context window)](https://gist.github.com/faraazahmad/d20057a8fade5e6818a59df652b455b3) | 30% |
 | Which functions implement animations and transitions? | 33k [(Context window)](https://gist.github.com/faraazahmad/3fe1e6f0e151fada6656d03e32c3a51a) | 22k [(Context window)](https://gist.github.com/faraazahmad/48c0dd68700c554765d1cd79505247e9) | 33% |
+
+**Table 4:** Reduction in token usage when using semantic search
 
 The agent uses text-based searching and is at the mercy of the model's ability to produce synonyms, semantic search does not have that problem. But when you use semantic similarity search for classification, the **non-determinism of natural language introduces a halting problem**. You either hard-code a `topK` value when searching so that the results are capped at the `K` most similar items, or you get a
 sorted list of most similar items and ask an LLM to classify if a certain result does indeed satisfy the query:
@@ -386,11 +389,13 @@ Yet again, you are at the mercy of the LLM to come up with synonymns and "unders
 ### Savings with dependency graphs
 
 It's a similar story when comparing token usage for getting dependency graphs. LLMs will spend 30k+ tokens and won't even come up with
-all the right paths for the call graph while the graph database doesn't even break a sweat executing your query. You know how it goes by now, I won't bore you with even more benchmark data.
+all the right paths for the call graph while the graph database doesn't even break a sweat executing your query.
 
 ![Zed coding agent window trying to get call stacks](https://pbs.twimg.com/media/GzOekpwa8AAXFLV?format=jpg&name=large)
 ![Neo4j browser screenshot showing all call graphs that lead to a certain functionZed coding agent window trying to get call stacks](https://pbs.twimg.com/media/GzOeqoIaUAAePF0?format=jpg&name=4096x4096)
 <Tweet id="https://x.com/Faraaz98/status/1960086112049020977" />
+
+You know how it goes by now, I won't bore you with even more benchmark data.
 
 # Epilogue
 
@@ -409,6 +414,11 @@ all the right paths for the call graph while the graph database doesn't even bre
 > He never returned.
 
 **Natural language is non-deterministic by nature**. Combine this with the stochastic nature of LLMs, and you have the perfect breeding
-ground for LLM hallucinations. Ask an LLM if a function implements animations logic, sometimes it will take into account the animation easing functions like: `linear`, `ease-in`, `cubic-bezier`, etc. and sometimes it won't. Unfortunately there is no right or wrong answer here. It's upto the user to decide what they meant in that context. While I don't have a solution for this annoying lack of determinism, the tools I've built help you get there faster.
+ground for LLM hallucinations. Ask an LLM if a function implements animations logic, sometimes it will take into account the animation easing functions like: `linear`, `ease-in`, `cubic-bezier`, etc. and sometimes it won't. Unfortunately there is no right or wrong answer here. It's upto the user to decide what they meant in that context. While I don't have a solution for this annoying lack of determinism, the tools I've built will help you get there faster.
 
 <LinkPreview id="https://github.com/faraazahmad/graphsense" />
+
+## References
+
+1. [RULER: What's the Real Context Size of Your Long-Context Language Models?](https://arxiv.org/abs/2404.06654)
+2. [SemTools: Are coding agents all you need?](https://www.llamaindex.ai/blog/semtools-are-coding-agents-all-you-need)
