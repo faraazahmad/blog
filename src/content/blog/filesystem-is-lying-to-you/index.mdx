@@ -414,8 +414,8 @@ I'm sorry, what?
 * It did not perform transaction 301.
 * It didn't even know transaction 301 existed.
 
-And yet it can be the process that observes the writeback error. **This is where 
-the mental model really falls apart.** We tend to imagine:
+And yet it's the process that has to deal with the writeback error. **This is where my mental model really fell 
+apart.** We tend to imagine:
 
 ```text
 my write
@@ -446,7 +446,7 @@ that the operation observing the error may not be the operation that caused the 
 is great for detecting failures. And terrible if you were planning to do:
 
 ```text
-EIO == this transaction failed
+EIO == current transaction failed
 ```
 
 ---
@@ -455,17 +455,17 @@ EIO == this transaction failed
 
 No.
 
-And sorry about the clickbait title, it's just what you gotta do in the attention economy.
+_(And sorry about the clickbait title, it's just what you gotta do in the attention economy.)_
 
 ![Man saying the game is rigged](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNDA2Nnl6NTU5MTk5eTA0enZseWo2Z2V5OXNuMW1sb2M0d3YxYjdlZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/wMsD35WIjjUFq/giphy.gif)
 
-The filesystem is allowed to do asynchronous writeback. Linux has explicit machinery for tracking 
-writeback errors precisely because those errors can otherwise disappear into the void.
+The filesystem is well within its rights to perform asynchronous writeback. Linux has explicit machinery for tracking 
+writeback errors _precisely_ because those errors can otherwise disappear into the void.
 
 The weird part is the gap between:
 
 ```text
-what the system call actually promises
+what is promised on the tin
 ```
 
 and:
@@ -481,19 +481,17 @@ An API can be behaving correctly while your mental model of the API is completel
 # fsyncgate
 **(or how the PostgreSQL folks learned this the hard way)**
 
-This is why PostgreSQL gets extremely uncomfortable when it sees an `fsync()` failure.
+![fsyncgate news articles](./fsyncgate.png)
+
+This is why PostgreSQL now gets extremely uncomfortable when it sees an `fsync()` failure.
 
 PostgreSQL had a long-running fsync reliability saga, with failures around checkpoint/writeback 
 behavior exposing how dangerous it is for a database to keep operating when it can no longer 
 establish that its durable state is trustworthy.
 
-The PostgreSQL response is delightfully conservative:
-
-**If it can't trust the durability boundary, it PANICs.**
-
-At first this sounds ridiculous. Why crash an entire database because one `fsync()` failed?
-
-Because the alternative is:
+The PostgreSQL response is delightfully conservative: **If it can't trust the durability boundary,
+it PANICs.** At first this sounds ridiculous. Why crash an entire database because one `fsync()` 
+failed? Because the alternative is:
 
 ```text
 "I don't know which parts of my state are actually durable..."
@@ -503,9 +501,7 @@ Because the alternative is:
 "please send me the next transaction"
 ```
 
-That's not a particularly comforting database.
-
-Imagine the database is now in a state where:
+That's not a particularly comforting database. Imagine the database is now in a state where:
 
 ```text
 WAL:
@@ -522,7 +518,6 @@ DATABASE:
 ```
 
 Continuing to accept writes means building new state on top of a state you can no longer fully explain.
-
 So PostgreSQL effectively says:
 
 ```text
