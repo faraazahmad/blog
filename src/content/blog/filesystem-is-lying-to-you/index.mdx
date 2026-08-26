@@ -8,6 +8,15 @@ authors: ['faraaz']           # optional, must match an author in src/content/au
 draft: false                   # optional, hides post from production builds
 ---
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap"
+  rel="stylesheet"
+/>
+
+import FsyncgateCollage from '@/components/FsyncgateCollage.astro'
+
 I want to tell you about the day a program I wrote did everything right.
 
 It checked every error code.
@@ -481,7 +490,7 @@ An API can be behaving correctly while your mental model of the API is completel
 # fsyncgate
 **(or how the PostgreSQL folks learned this the hard way)**
 
-![fsyncgate news articles](./fsyncgate.png)
+<FsyncgateCollage />
 
 This is why PostgreSQL now gets extremely uncomfortable when it sees an `fsync()` failure.
 
