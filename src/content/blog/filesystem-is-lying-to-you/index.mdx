@@ -547,8 +547,9 @@ And honestly, after watching the CuttleFS experiment, that policy makes a lot mo
 
 ## The temp-file trick has a sneaky extra step too
 
-While we're talking about things filesystems don't promise, there's another classic one worth 
-remembering. Say you want to replace a config file without ever leaving it half-written. The usual pattern is:
+While we're talking about things filesystems don't promise, there's another classic one 
+worth remembering. Say you want to replace a config file without ever leaving it half-written.
+The usual pattern is:
 
 ```python
 with open("config.tmp", "w") as f:
@@ -565,9 +566,10 @@ finally:
     os.close(dirfd)
 ```
 
-Why the second `fsync()`? **Because the file contents and the directory entry are different pieces of state.**
+Why the second `fsync()`? **Because the file contents and the directory entry are different 
+pieces of filesystem state.**
 
-First you make the bytes durable:
+First you make the file's contents durable:
 
 ```text
 fsync(config.tmp)
@@ -579,18 +581,21 @@ Then you atomically change the name:
 rename(config.tmp, config)
 ```
 
-Then you make the **directory change** durable:
+The rename is atomic from the point of view of processes observing the filesystem, but 
+that doesn't by itself mean the rename will survive a crash.
+
+So you then make the **directory change** durable:
 
 ```text
 fsync(parent directory)
 ```
 
-The first time I learned this, I remember thinking: _"Wait. The filename needs an `fsync()` too?"_
+The first time I learned this, I remember thinking: *"Wait. The directory needs an `fsync()` too?"*
+And the filesystem, with the patience of an extremely literal coworker, basically replies:
+*"You asked me to persist the file's contents. You did not ask me to persist the directory 
+entry pointing to it."*
 
-And the filesystem, with the patience of an extremely literal coworker, basically replies: 
-_"You asked me to persist the contents. You did not ask me to persist the name."_
-
-Well fair enough, you live you learn.
+Well Okay. You live, you learn.
 
 ---
 
@@ -614,11 +619,9 @@ write() == accepted for writing
 
 ### 2. Use `fsync()` when persistence is part of correctness
 
-If you are about to do something that assumes data will survive a crash, you need a real synchronization point.
-
-Don't use `fsync()` because it sounds reassuring.
-
-Use it because your correctness model requires durability.
+If you are about to do something that assumes data will survive a crash, you need a 
+real synchronization point. **Don't use `fsync()` because it sounds reassuring.** Use it 
+because your correctness model requires durability.
 
 ### 3. If you use temp + rename, synchronize the directory too
 
@@ -638,9 +641,7 @@ There are two different kinds of state here: file contents and namespace changes
 
 ### 4. Don't assume the next error belongs to the next write
 
-This is probably the most important lesson from the experiment.
-
-If you have:
+This is probably the most important lesson from the experiment. If you have:
 
 ```text
 tx A
@@ -650,33 +651,24 @@ tx B
 fsync() → EIO
 ```
 
-don't automatically conclude:
-
-```text
-tx B failed
-```
-
-The error may be telling you about earlier writeback.
-
-The filesystem API does not give you the neat transaction-level mapping your application might wish it did.
+don't automatically conclude that `tx B` failed. The error may be telling you about 
+earlier writeback. The filesystem API does not give you the neat transaction-level 
+mapping your application might wish it did.
 
 ### 5. Check later error paths too
 
-On Linux, writeback errors can be reported later through operations such as `fsync()`, `fdatasync()`, or `close()`, depending on the path and filesystem.
+On Linux, writeback errors can be reported later through operations such as `fsync()`,
+`fdatasync()`, or `close()`, depending on the path and filesystem. So the annoying answer is:
 
-So the annoying answer is:
-
-**yes, you need to keep checking.**
+**yes, you need to keep checking after every write, sync or close operation.**
 
 ### 6. If you're implementing a real WAL, maybe don't invent a database from scratch
 
 SQLite is literally a file.
 
-It still has to deal with all of this nonsense.
-
-But somebody else has spent a *very* long time figuring out crash recovery, journaling/WAL behavior, checksums, concurrency and transaction semantics.
-
-That's one of the great gifts of databases.
+It still has to deal with all of this nonsense. But somebody else has spent a *very* long 
+time figuring out crash recovery, journaling/WAL behavior, checksums, concurrency and 
+transaction semantics. **That's one of the great gifts of databases.**
 
 They take a collection of extremely awkward storage primitives and turn them into something that looks like:
 
@@ -685,17 +677,12 @@ BEGIN
 COMMIT
 ```
 
-Which is much nicer than:
-
-```text
-please consider the possibility that my inode has inherited a deferred
-writeback error from a different process while the storage controller
-is having a bad day
-```
+Which is much nicer than: _please consider the possibility that my inode has inherited a deferred
+writeback error from a different process while the storage controller is having a bad day._
 
 ---
 
-# `fsync()` still can't save you from the bank
+# fsync() still can't save you from the bank
 
 There's one last thing that bothered me about the payment example.
 
@@ -715,17 +702,10 @@ I can make this durable:
 "I intend to send $50,000"
 ```
 
-and then I can send the money.
-
-But I cannot make these two operations magically become one atomic instruction:
-
-```text
-persist intent + send money
-```
-
-There is always a nasty little window between them.
-
-So a real payment system still needs things like idempotency, retries, reconciliation and recovery logic.
+and then I can send the money. But I cannot make these two operations magically become one 
+atomic instruction that persist intents and sends money. There is always a nasty little 
+window between them. So a real payment system still needs things like idempotency, retries,
+reconciliation and recovery logic.
 
 For example:
 
@@ -736,9 +716,9 @@ For example:
 4. If we crash between 2 and 3, reconcile.
 ```
 
-And that is where filesystem durability quietly turns into distributed-systems territory.
-
-The moment another machine is involved, `fsync()` can only solve the problems on **your side** of the boundary.
+This is where filesystem durability quietly turns into distributed-systems territory. The 
+moment another machine is involved, `fsync()` can only solve the problems on **your side**
+of the boundary.
 
 It cannot convince the bank that your WAL entry and its transfer happened atomically.
 
@@ -746,7 +726,8 @@ It cannot convince the bank that your WAL entry and its transfer happened atomic
 
 # The mental model I'm keeping
 
-After all of this, I've ended up with a much uglier — but more useful — mental model.
+After all of this, I've ended up with a much more convoluted mental model, but it is 
+more accurate.
 
 There are several different things hiding underneath the word **done**:
 
@@ -772,37 +753,18 @@ external side effect
     └──► another system actually did something
 ```
 
-Those are not the same event.
+Those are not the same event. A lot of really nasty systems bugs happen when we casually 
+collapse them into one _"done"_.
 
-And a lot of really nasty systems bugs happen when we casually collapse them into one:
-
-```text
-"done"
-```
-
-That was my mistake.
-
-I thought:
-
-```text
-fsync() == durable transaction
-```
-
-What I actually had was:
-
-```text
-fsync() == a synchronization boundary
-```
-
-And even a trustworthy local durability boundary doesn't make an external side effect atomic.
+That was my mistake. I thought `fsync() == durable transaction`. What I actually happened was
+`fsync() == a synchronization boundary`. And even a trustworthy local durability boundary 
+doesn't make an external side effect atomic.
 
 So, no.
 
-Your filesystem probably isn't lying to you.
+**Your filesystem probably isn't lying to you, It's being annoyingly precise.**
 
-It's being annoyingly precise.
-
-**The problem is that we keep asking it questions in English and interpreting the answers in our own language.**
+The problem is that we keep asking it questions in English and interpreting the answers in our own language.
 
 The hard part isn't writing bytes.
 
