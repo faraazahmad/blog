@@ -10,12 +10,11 @@ draft: false                   # optional, hides post from production builds
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap"
-  rel="stylesheet"
-/>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet"/>
 
 import FsyncgateCollage from '@/components/FsyncgateCollage.astro'
+import MarginNote from '@/components/MarginNote.astro'
+import FsAnim from './FsAnim.astro'
 
 <p style="font: italic 5rem serif !important;">
 I want to tell you about the day a program I wrote did everything right.
@@ -53,7 +52,7 @@ fsync()
 "cool, it's on disk"
 ```
 
-Seems reasonable ¯\\_(ツ)_/¯ 
+Seems reasonable ¯\\\_(ツ)\_/¯ 
 
 If I'm building a little payment system, I could do:
 
@@ -112,16 +111,22 @@ with open("todos.txt", "w") as f:
     f.write("buy milk")
 ```
 
-Suppose the laptop immediately loses power after running this code. What is in `todos.txt` when it comes back on?
-You might say:
+Now imagine the laptop immediately loses power after `write()` returns. What is in `todos.txt` when it comes back on?
+You might expect either the old file or the new one containing "but milk". After all, the write succeeded.
 
-> Either the old file or `buy milk`.
+Right? Welllll...
 
-Unfortunately, **the filesystem never signed that contract with you**. A successful `write()` basically means 
-the kernel accepted the bytes for writing. The dirty data can sit in memory and be written back later.  It's just 
-one of the sad consequences of having to make computers really fast.
+Unfortunately, **the filesystem never signed that contract with you**. Depending on what had already reached 
+stable storage, you could potentially see anything from the below:
 
-If every tiny write had to _synchronously_ wait for storage, we'd spend a remarkable amount of time in our lives staring 
+* the old contents
+* the new contents: buy milk
+* partially updated contents or other filesystem-dependent results in some failure scenarios
+* an empty or missing file, depending on what happened before the crash and the filesystem/storage behavior
+
+A successful `write()` basically means 
+the kernel accepted the bytes for writing. The dirty data can sit in memory and be written back later.  **It's just 
+one of the sad consequences of having to make computers really fast.** If every tiny write had to _synchronously_ wait for storage, we'd spend a remarkable amount of time in our lives staring 
 at spinning beach balls while a computer performs the ancient ritual of moving bytes from one place to another.
 
 So we get this:
@@ -146,7 +151,7 @@ That'll do the trick right?
 
 Right??
 
-Well...
+![Stanley from The Office giving a side eye](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmhnOGE1Y2tlMG1nZTF4NnB0YnlmeDEycm9xYmd2ZWxmOWU3b2kyciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/UbLnLnbbYQTDc2bmbJ/giphy.gif)
 
 ---
 
@@ -158,8 +163,8 @@ Before we get to `fsync()`, there’s one more piece of the puzzle: **journaling
 The idea is wonderfully boring.
 </section>
 
-Imagine an accountant updating a giant ledger. They don’t just start changing the account balances and hope 
-nobody knocks over the desk halfway through. Instead, they first write down the transactions separately and 
+Imagine an accountant updating a giant ledger. They wouldn’t just start changing the account balances and hope 
+nobody knocks over the desk halfway through. Instead, they will first write down the transactions separately and 
 then apply those changes to the account balances. If they’re interrupted halfway through, they can use the 
 transaction record to finish the update and restore the ledger to a coherent state.
 
@@ -177,10 +182,10 @@ Suppose the filesystem was halfway through creating a directory entry and updati
 machine lost power. The journal can help the filesystem finish or roll back those metadata changes, 
 leaving the filesystem in a valid state. But that doesn’t necessarily mean your application’s write made it to disk.
 
-Journaling protects the filesystem’s **consistency**. It does not, by itself, guarantee the **durability of your 
-data**. But the filesystem being able to say: _"My metadata is internally consistent."_ is not the same thing as your 
-database saying: _"Transaction 101 definitely made it to persistent storage."_. **Those are two completely 
-different promises.**
+**Journaling protects the filesystem’s consistency**. It does not, by itself, guarantee the durability of your 
+data. But the filesystem being able to say: _"My metadata is internally consistent."_ is not the same thing as your 
+database saying: _"Transaction 101 definitely made it to persistent storage."_. Those are two completely 
+different promises.
 
 On `ext4` filesystem, for example, you can choose different data modes. 
 
@@ -220,18 +225,14 @@ dirty data
  fsync()
    │
    ▼
-synchronization boundary
+safely committed to disk
 ```
 
 A successful `fsync(fd)` call asks the kernel to synchronize the state associated with that 
 file and wait for the synchronization to complete according to the filesystem/storage contract. 
 This is a very useful guarantee. It is also apparently not useful enough for me to keep 
-my fictional `$200,000`.
-
-Because there's a subtle detail hiding underneath all this: **storage failures do not always get 
-reported at the operation that caused them.** And Linux deliberately keeps track of some writeback 
-errors so that they are not silently lost. The Linux `fsync(2)` documentation even warns that an 
-`EIO` can relate to data written through another file descriptor referring to the same file.
+my fictional `$200,000`. Because there's a subtle detail hiding underneath all this:
+**storage failures do not always get reported at the operation that caused them.** And Linux deliberately keeps track of some writeback errors so that they are not silently lost. The Linux `fsync(2)` documentation even warns that an `EIO` can relate to data written through another file descriptor referring to the same file.
 
 So our nice little model:
 
@@ -261,10 +262,17 @@ That is the part I wanted to see for myself. So I built an experiment:
 
 ---
 
+<MarginNote
+  title=""
+>
+  CuttleFS runs in userspace via FUSE, so its writeback path differs from a kernel
+  filesystem like ext4: it can model fsync() reporting success even though the underlying
+  storage write failed. The experiments are therefore *illustrative* of deferred-writeback-error semantics, not a literal ext4 reproduction holds across real filesystems, as the PostgreSQL  fsyncgate saga demonstrated.
+</MarginNote>
+
 # Let's break the disk on purpose
 
-I used **CuttleFS**, an educational userspace filesystem developed at University of Wisconsin - Madison for their own research,
-that lets me inject deterministic storage failures.
+I used **CuttleFS**, an educational userspace filesystem developed at University of Wisconsin - Madison for their own research, that lets me inject deterministic storage failures.
 
 The application is a tiny mock payment gateway. The code is intentionally simple:
 
@@ -276,6 +284,7 @@ The application is a tiny mock payment gateway. The code is intentionally simple
 That's it. None of that race-condition gymnastics or any other cleverness.
 
 Then I made the **very first WAL write fail** at the storage layer. And things got weird very quickly.
+
 
 ---
 
@@ -330,10 +339,12 @@ MY WAL
 No such transaction ever happened
 ```
 
+<FsAnim scenario={1} />
+
 This is much worse than "a write got lost". My application has performed an external 
 side effect without any durable evidence that it did so.
 
-If the customer asks us what happened, our database says:
+If the customer asks us what happened to the `$50,000?`, our database says:
 
 > "What `$50,000`?"
 
@@ -398,6 +409,8 @@ clean shutdown. This one bothered me more than Scenario 1. Because now we don't 
 have the comfort of saying: _"Well, at least the application got an error."_ **The 
 filesystem knew. The application didn't.** 
 
+<FsAnim scenario={2} />
+
 Once the process is gone, an error-handling branch in your code isn't exactly going 
 to manifest through sheer vibes.
 
@@ -429,7 +442,11 @@ I'm sorry, what?
 * It did not perform transaction 301.
 * It didn't even know transaction 301 existed.
 
-And yet it's the process that has to deal with the writeback error. **This is where my mental model really fell 
+And yet it's the process that has to deal with the writeback error. 
+
+<FsAnim scenario={3} />
+
+**This is where my mental model really fell 
 apart.** We tend to imagine:
 
 ```text

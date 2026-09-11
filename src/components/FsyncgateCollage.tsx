@@ -445,7 +445,7 @@ function CaseNote() {
     <div
       className="flex h-72 flex-col gap-0 overflow-hidden pr-4 pb-2 pl-10"
       style={{
-        fontFamily: "'Schoolbell', cursive",
+        fontFamily: "'Caveat', cursive",
         color: '#33415e',
       }}
     >
