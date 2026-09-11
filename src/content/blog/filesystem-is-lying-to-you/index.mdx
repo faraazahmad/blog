@@ -17,7 +17,9 @@ draft: false                   # optional, hides post from production builds
 
 import FsyncgateCollage from '@/components/FsyncgateCollage.astro'
 
+<p style="font: italic 5rem serif !important;">
 I want to tell you about the day a program I wrote did everything right.
+</p>
 
 It checked every error code.
 
@@ -29,15 +31,15 @@ It aborted when `fsync()` returned an error.
 
 **Then it lost $200,000 of pretend money**.
 
-The money was fake, but the bug was not. And the really annoying part was that I wasn't doing anything obviously stupid. I wasn't forgetting to call `fsync()`. 
-I wasn't ignoring an `EIO`. I wasn't deleting the WAL halfway through the program because I got bored. I was doing 
-what the textbook says, the problem was my mental model of what `fsync()` meant.
+The money was fake, but the bug certainly wasn't. And the really annoying part was that I wasn't doing anything obviously stupid. I wasn't forgetting to call `fsync()`. 
+I wasn't ignoring an `EIO` error. I wasn't deleting the WAL halfway through for shits and giggles. 
+I was doing what the textbook says, the problem was my mental model of what `fsync()` meant.
 
 That's what sent me down this rabbit hole.
 
 ---
 
-## Wait back up, what does `fsync()` actually mean?
+## What does `fsync()` actually do?
 
 Let's start with the mental model I had before this experiment:
 
@@ -51,9 +53,9 @@ fsync()
 "cool, it's on disk"
 ```
 
-Seems reasonable.
+Seems reasonable ¯\\_(ツ)_/¯ 
 
-If I'm building a little payment system, I can do:
+If I'm building a little payment system, I could do:
 
 ```text
 write transaction to WAL
@@ -63,13 +65,13 @@ write transaction to WAL
    send the money
 ```
 
-The WAL is durable before I send the money, **what could possibly go wrong?**
+The WAL is durable before I send the money, **what could possibly go wrong?** Famous last words.
 
-Famous last words. Apparently quite a lot can. Because the actual path looks more like this:
+Apparently quite a lot can. Because the actual path looks more like this:
 
 <section style="text-align: center">
 ```text
-    MY PROGRAM
+MY PROGRAM
 │
 write()
 │
@@ -90,7 +92,7 @@ STORAGE CONTROLLER
 ▼
 SSD / DISK
 ```
-  </section>
+</section>
 
 There are a bunch of layers between "my program wrote 64 bytes" and "those 64 bytes are now sitting 
 safely somewhere that survives a power cut". And all of those layers have slightly different ideas 
@@ -102,22 +104,24 @@ That word is doing a *lot* of work here.
 
 ## `write()` doesn't actually put your bytes on disk
 
-Sorry to burst your bubble, let me show you why that is the case. Consider this extremely sophisticated database:
+Sorry to burst your bubble, but the `write()` function doesn't commit your bytes to disk. Let me show you.
+Consider this extremely sophisticated database:
 
 ```python
 with open("todos.txt", "w") as f:
     f.write("buy milk")
 ```
 
-Suppose the laptop immediately loses power. What is in `todos.txt` when it comes back? You might say:
+Suppose the laptop immediately loses power after running this code. What is in `todos.txt` when it comes back on?
+You might say:
 
 > Either the old file or `buy milk`.
 
 Unfortunately, **the filesystem never signed that contract with you**. A successful `write()` basically means 
-the kernel accepted the bytes for writing. The dirty data can  sit in memory and be written back later.  It's just 
+the kernel accepted the bytes for writing. The dirty data can sit in memory and be written back later.  It's just 
 one of the sad consequences of having to make computers really fast.
 
-If every tiny write had to synchronously wait for storage, we'd spend a remarkable amount of our lives staring 
+If every tiny write had to _synchronously_ wait for storage, we'd spend a remarkable amount of time in our lives staring 
 at spinning beach balls while a computer performs the ancient ritual of moving bytes from one place to another.
 
 So we get this:
@@ -150,11 +154,14 @@ Well...
 
 Before we get to `fsync()`, there’s one more piece of the puzzle: **journaling**.
 
+<section style="font: serif italic">
 The idea is wonderfully boring.
+</section>
 
-Imagine an accountant updating a giant ledger. They don’t just start scribbling over the only copy 
-and hope nobody knocks over the desk. They first seperately write down enough information to recover the operation 
-if the power goes out halfway through.
+Imagine an accountant updating a giant ledger. They don’t just start changing the account balances and hope 
+nobody knocks over the desk halfway through. Instead, they first write down the transactions separately and 
+then apply those changes to the account balances. If they’re interrupted halfway through, they can use the 
+transaction record to finish the update and restore the ledger to a coherent state.
 
 ![journalling file system](./journal_fs.png)
 
@@ -162,7 +169,7 @@ A journaling filesystem does roughly the same thing for its **own bookkeeping**.
 changes, it records them in a journal. If the machine crashes halfway through, the filesystem can 
 replay that journal and reconstruct its internal structures into a consistent state.
 
-And there’s an important distinction here:
+But there’s an important distinction here:
 
 > **A filesystem can be perfectly consistent while your application data is still wrong.**
 
@@ -172,10 +179,14 @@ leaving the filesystem in a valid state. But that doesn’t necessarily mean you
 
 Journaling protects the filesystem’s **consistency**. It does not, by itself, guarantee the **durability of your 
 data**. But the filesystem being able to say: _"My metadata is internally consistent."_ is not the same thing as your 
-database being able to say: _"Transaction 101 definitely made it to persistent storage."_. **Those are two completely 
+database saying: _"Transaction 101 definitely made it to persistent storage."_. **Those are two completely 
 different promises.**
 
-On `ext4`, for example, you can choose different data modes. `data=journal` is the strongest data-journaling mode. `data=ordered`, the default, orders file data before committing the corresponding metadata transaction. `data=writeback` gives weaker ordering between data and metadata.
+On `ext4` filesystem, for example, you can choose different data modes. 
+
+* `data=journal` is the strongest data-journaling mode. 
+* `data=ordered`, the default, orders file data before committing the corresponding metadata transaction. 
+* `data=writeback` gives weaker ordering between data and metadata.
 
 The exact implementation details differ across filesystems, but the key idea is simple:
 
@@ -185,14 +196,13 @@ filesystem recovery
 application transaction durability
 ```
 
-A journal is primarily there to help the filesystem recover **itself**. It does not know that your 
-64-byte record means:
+A journal is primarily there to help the filesystem recover **itself**. It does not know that your 64-byte record means:
 
 ```text
 "Faraaz is about to send someone fifty thousand dollars."
 ```
 
-The filesystem goes like:
+Want to ensure your data semantics are coherent? The filesystem goes like:
 ![I missed the part where thats my problem](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNzRubGtwbm5kazRmMHRtbngyb29oaWVwdTl5MGo4YXY0N2g5YjJqaSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/nY6G7GzMaCPuU5yPev/giphy.gif)
 
 ---
@@ -213,7 +223,7 @@ dirty data
 synchronization boundary
 ```
 
-A successful `fsync(fd)` asks the kernel to synchronize the state associated with that 
+A successful `fsync(fd)` call asks the kernel to synchronize the state associated with that 
 file and wait for the synchronization to complete according to the filesystem/storage contract. 
 This is a very useful guarantee. It is also apparently not useful enough for me to keep 
 my fictional `$200,000`.
@@ -253,19 +263,17 @@ That is the part I wanted to see for myself. So I built an experiment:
 
 # Let's break the disk on purpose
 
-I used **CuttleFS**, an educational userspace filesystem developed at University of Wisconsin - Madison, that lets me inject deterministic storage failures.
+I used **CuttleFS**, an educational userspace filesystem developed at University of Wisconsin - Madison for their own research,
+that lets me inject deterministic storage failures.
 
-The application is a tiny mock payment gateway written in Zig. The code is intentionally simple:
+The application is a tiny mock payment gateway. The code is intentionally simple:
 
 1. Append a 64-byte transaction record to a WAL.
 2. Call `fsync()`.
 3. If it succeeds, send the money.
 4. If it fails, abort the transaction.
 
-That's it.
-
-No cleverness. No race-condition gymnastics. No "well, actually, the application should have used a database"
-escape hatch.
+That's it. None of that race-condition gymnastics or any other cleverness.
 
 Then I made the **very first WAL write fail** at the storage layer. And things got weird very quickly.
 
@@ -310,9 +318,7 @@ Then I crash the machine and recover the WAL.
 
 ![GIF of Michael Scott saying wait a second](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWpxdzk5YXEweHltMmtpdzdlb2tybnF0ZmZwN2N5bno2eGZjaGRncSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/k6r6lTYIL9j9ZeRT51/giphy.gif)
 
-Yep. Both transactions are gone. But the first $50,000 was already sent.
-
-So now we have:
+Yep. Both transactions are gone. But the first `$50,000` was already sent, so now we have:
 
 ```text
 REAL WORLD
@@ -325,7 +331,7 @@ No such transaction ever happened
 ```
 
 This is much worse than "a write got lost". My application has performed an external 
-side effect without a durable record proving that it performed the side effect.
+side effect without any durable evidence that it did so.
 
 If the customer asks us what happened, our database says:
 
@@ -333,7 +339,7 @@ If the customer asks us what happened, our database says:
 
 The bank says:
 
-> "The `$50,000` we already sent? That `$50,000`?"
+> "The `$50,000` we already sent? That `$50,000`?!"
 
 Excellent. This is the kind of bug that makes reconciliation someone's full-time job.
 
