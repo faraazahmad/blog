@@ -7,8 +7,12 @@
  *   3 — an innocent process gets blamed
  *
  * All motion is pure CSS keyframes, sequenced with per-element delays.
- * The `playing` class (toggled by the replay button / IntersectionObserver)
- * drives every animation, so replay = remove class, reflow, re-add class.
+ * The `playing` class (toggled by the replay button) drives every
+ * animation, so replay = remove class, reflow, re-add class.
+ *
+ * The stage is a fixed 760px-wide canvas that scrolls sideways inside
+ * .fs-scroll on phones, so the animation plays on mobile too. A static
+ * step-by-step summary replaces it only under prefers-reduced-motion.
  */
 interface Props {
   scenario: 1 | 2 | 3
@@ -30,6 +34,8 @@ const titles: Record<number, string> = {
     </span>
     <button class="fs-anim-replay" type="button">Replay</button>
   </div>
+
+  <p class="fs-scroll-hint">← the stage is wide — drag sideways to follow the write →</p>
 
   <div class="fs-scroll">
     <div class={`fs-canvas h${scenario}`}>
@@ -398,6 +404,10 @@ const titles: Record<number, string> = {
   }
 
   /* ---------- stage ---------- */
+
+  .fs-scroll {
+    overflow-x: auto;
+  }
 
   .fs-canvas {
     position: relative;
@@ -822,12 +832,11 @@ const titles: Record<number, string> = {
     display: none;
   }
 
+  /* NOTE: no display:flex here — flex on an ol strips the list
+     markers in Chromium/Safari, which reads as broken numbering */
   .reduced-summary ol {
     margin: 0;
     padding-left: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
     list-style: decimal;
     font-size: 13px;
     line-height: 1.55;
@@ -836,6 +845,10 @@ const titles: Record<number, string> = {
 
   .reduced-summary li {
     padding: 0.15rem 0;
+  }
+
+  .reduced-summary li + li {
+    margin-top: 0.45rem;
   }
 
   .reduced-summary b {
@@ -852,25 +865,25 @@ const titles: Record<number, string> = {
 
   /* ---------- mobile ---------- */
 
-  @media (max-width: 640px) {
-    .fs-scroll {
-      overflow-x: hidden;
-    }
+  /* The animation keeps playing on phones — below 720px the canvas
+     locks to its 760px design width and scrolls sideways inside
+     .fs-scroll (same pattern as the fsyncgate board). Above that the
+     layout is fluid and fits the prose column. Only
+     prefers-reduced-motion swaps in the static summary. */
+  .fs-scroll-hint {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
     .fs-canvas {
-      min-width: unset;
+      min-width: 760px;
     }
-    .fs-canvas .el,
-    .fs-canvas .crash,
-    .fs-canvas .lane,
-    .fs-canvas .hint {
-      display: none;
-    }
-    .reduced-summary {
+    .fs-scroll-hint {
       display: block;
-      padding: 1rem 1.25rem;
-    }
-    .fs-anim.playing .hint {
-      opacity: 0;
+      padding: 0.35rem 0.9rem 0.5rem;
+      font-size: 10px;
+      color: var(--muted-foreground);
+      text-align: center;
     }
   }
 </style>
