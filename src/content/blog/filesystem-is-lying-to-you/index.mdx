@@ -265,9 +265,7 @@ That is the part I wanted to see for myself. So I built an experiment:
 <MarginNote
   title=""
 >
-  CuttleFS runs in userspace via FUSE, so its writeback path differs from a kernel
-  filesystem like ext4: it can model fsync() reporting success even though the underlying
-  storage write failed. The experiments are therefore *illustrative* of deferred-writeback-error semantics, not a literal ext4 reproduction holds across real filesystems, as the PostgreSQL  fsyncgate saga demonstrated.
+  CuttleFS runs in userspace via FUSE, so it can only mock fsync() reporting success or failure, not actually cause it to do so. The experiments are therefore not a literal ext4 reproduction, but the logic does hold across real filesystems as the PostgreSQL fsyncgate saga demonstrated.
 </MarginNote>
 
 # Let's break the disk on purpose

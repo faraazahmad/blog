@@ -129,8 +129,13 @@
 
   .margin-note p,
   .margin-note strong {
-    @apply text-muted-foreground;
+    @apply text-indigo-700;
   }
+
+  .dark .margin-note p {
+      @apply text-indigo-400;
+  }
+
 
   .margin-note p {
     @apply my-0;
@@ -148,8 +153,8 @@
 
     .margin-note p {
       @apply leading-6;
-      font-size: 1.5rem;
-      line-height: 2.5rem;
+      font-size: 1.75rem;
+      line-height: 2.25rem;
     }
   }
 }
