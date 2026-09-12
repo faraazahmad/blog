@@ -122,7 +122,7 @@
 
   /* Inline note that moves into the right margin on large screens */
   .margin-note {
-    @apply my-6 pl-10;
+    @apply hidden my-6 pl-10;
     font-family: 'Caveat', cursive;
     transform: rotate(-1.5deg) skewX(-1deg);
   }
@@ -138,6 +138,7 @@
 
   @media (min-width: 1536px) {
     .margin-note {
+        @apply block;
       float: right;
       clear: right;
       width: 25rem;
