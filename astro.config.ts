@@ -78,12 +78,6 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
-    build: {
-      // Keep `@layer` order statements in the bundled CSS. The default minifier
-      // strips them, which lets Tailwind's preflight override the `.prose`
-      // component styles depending on CSS chunk order.
-      cssMinify: false,
-    },
   },
   server: {
     port: 1234,

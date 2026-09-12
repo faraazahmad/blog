@@ -1,14 +1,3 @@
-@reference './global.css';
-
-/*
-  Establish cascade-layer priority explicitly. In production the bundler can
-  emit this file before global.css, which would otherwise make `components`
-  the first (lowest-priority) layer and let Tailwind's preflight (`base`)
-  override the .prose styles. This statement pins the order regardless of
-  which CSS module ends up first in the bundle.
-*/
-@layer theme, base, components, utilities;
-
 @layer components {
   .prose {
     @apply text-foreground text-base leading-8;
