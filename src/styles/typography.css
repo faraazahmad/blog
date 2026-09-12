@@ -129,11 +129,11 @@
 
   .margin-note p,
   .margin-note strong {
-    @apply text-indigo-700;
+    @apply text-teal-700;
   }
 
   .dark .margin-note p {
-      @apply text-indigo-400;
+      @apply text-teal-400;
   }
 
 

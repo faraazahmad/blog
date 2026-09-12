@@ -26,10 +26,9 @@ const titles: Record<number, string> = {
 <section class={`fs-anim s${scenario}`}>
   <div class="fs-anim-head">
     <span class="fs-anim-title">
-      <span class="fs-anim-num">{scenario}</span>
       {titles[scenario]}
     </span>
-    <button class="fs-anim-replay" type="button">↻ Replay</button>
+    <button class="fs-anim-replay" type="button">Replay</button>
   </div>
 
   <div class="fs-scroll">
@@ -365,7 +364,7 @@ const titles: Record<number, string> = {
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    font-weight: 600;
+    font-family: monospace;
     color: var(--foreground);
   }
 
@@ -385,10 +384,10 @@ const titles: Record<number, string> = {
     flex-shrink: 0;
     cursor: pointer;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: 0.5rem;
     background: var(--background);
     color: var(--foreground);
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 1rem;
     font-size: 0.78rem;
     font-weight: 600;
     transition: background 0.15s ease;
@@ -400,14 +399,9 @@ const titles: Record<number, string> = {
 
   /* ---------- stage ---------- */
 
-  .fs-scroll {
-    overflow-x: auto;
-  }
-
   .fs-canvas {
     position: relative;
     width: 100%;
-    min-width: 760px;
   }
 
   .h1 {
@@ -424,7 +418,7 @@ const titles: Record<number, string> = {
     position: absolute;
     top: 8px;
     bottom: 8px;
-    border: 1px dashed color-mix(in oklab, var(--border) 80%, transparent);
+    border: 1px dashed color-mix(in oklab, var(--border) 100%, transparent);
     border-radius: 0.75rem;
   }
 
@@ -433,7 +427,7 @@ const titles: Record<number, string> = {
     top: 8px;
     left: 10px;
     padding: 2px 8px;
-    border-radius: 999px;
+    border-radius: 0.5rem;
     background: color-mix(in oklab, var(--secondary) 55%, transparent);
     color: var(--muted-foreground);
     font-size: 10px;
@@ -895,21 +889,21 @@ const titles: Record<number, string> = {
 
     const states: Record<string, State> = {
       idle: {
-        label: '▶ Play',
+        label: 'Play',
         action() {
           set('playing')
           anim.classList.add('playing')
         },
       },
       playing: {
-        label: '⏸ Pause',
+        label: 'Pause',
         action() {
           set('paused')
           anim.classList.add('paused')
         },
       },
       paused: {
-        label: '▶ Resume',
+        label: 'Resume',
         action() {
           anim.classList.remove('paused')
           set('playing')

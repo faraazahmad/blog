@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { ExternalLink, Lock, MousePointerClick } from 'lucide-react'
+import { ExternalLink, Lock } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 
@@ -15,44 +15,19 @@ interface Exhibit {
   title: string
   source: string
   date: string
-  blurb: string
-  tilt: string // resting rotation
-  dx: string // horizontal scatter (margin-left)
-  dy: string // vertical scatter (margin-top)
   pin: PinColor
   /** site sends X-Frame-Options / CSP frame-ancestors, so no iframe */
   sealed?: boolean
   quote?: string
 }
 
-/* Order matters: items 0-2 = top row, 3-5 = middle row (4 is the
-   center case note), 6-8 = bottom row. */
 const EXHIBITS: Exhibit[] = [
-  {
-    kind: 'article',
-    url: 'https://lwn.net/Articles/752063/',
-    title: "PostgreSQL's fsync() surprise",
-    source: 'lwn.net',
-    date: 'Apr 18, 2018',
-    blurb: 'The LWN write-up that broke the whole saga open for the world.',
-    tilt: '-2.5deg',
-    dx: '0.5rem',
-    dy: '0.5rem',
-    pin: 'red',
-    sealed: true,
-    quote:
-      'PostgreSQL assumes that a successful call to fsync() indicates that all data written since the last fsync() is durable...',
-  },
   {
     kind: 'article',
     url: 'https://danluu.com/fsyncgate/',
     title: 'Fsyncgate: errors on fsync are unrecovarable',
     source: 'danluu.com',
     date: 'Mar 28, 2018',
-    blurb: 'The post that named the scandal.',
-    tilt: '1.5deg',
-    dx: '-0.25rem',
-    dy: '1rem',
     pin: 'blue',
   },
   {
@@ -61,10 +36,6 @@ const EXHIBITS: Exhibit[] = [
     title: 'Fsync Errors',
     source: 'wiki.postgresql.org',
     date: 'ed. Jul 2023',
-    blurb: "The wiki's canonical timeline of the saga.",
-    tilt: '-1.5deg',
-    dx: '0.75rem',
-    dy: '0.25rem',
     pin: 'amber',
   },
   {
@@ -73,10 +44,6 @@ const EXHIBITS: Exhibit[] = [
     title: "Refactoring the checkpointer's fsync request queue",
     source: 'pgsql-hackers',
     date: 'Oct 15, 2018',
-    blurb: 'The thread where the PANIC policy got argued out.',
-    tilt: '2.5deg',
-    dx: '0.25rem',
-    dy: '-0.75rem',
     pin: 'amber',
   },
   {
@@ -85,10 +52,6 @@ const EXHIBITS: Exhibit[] = [
     title: 'CASE FILE',
     source: '',
     date: 'opened 2018',
-    blurb: '',
-    tilt: '-1deg',
-    dx: '-0.5rem',
-    dy: '-0.5rem',
     pin: 'red',
   },
   {
@@ -97,10 +60,6 @@ const EXHIBITS: Exhibit[] = [
     title: 'PANIC on fsync() failure.',
     source: 'git.postgresql.org',
     date: 'Nov 19, 2018',
-    blurb: 'The commit that made the call.',
-    tilt: '-2deg',
-    dx: '-0.75rem',
-    dy: '-0.25rem',
     pin: 'red',
   },
   {
@@ -109,10 +68,6 @@ const EXHIBITS: Exhibit[] = [
     title: 'why did fsync-gate not affect Oracle or MySQL?',
     source: 'pgsql-hackers',
     date: 'May 2, 2021',
-    blurb: 'Why did other databases dodge the bullet?',
-    tilt: '2deg',
-    dx: '-0.5rem',
-    dy: '-0.5rem',
     pin: 'blue',
   },
   {
@@ -121,28 +76,12 @@ const EXHIBITS: Exhibit[] = [
     title: 'The Computer Wants to Lose Your Data: Bonus Bits',
     source: 'blog.sinjakli.co.uk',
     date: 'Nov 29, 2025',
-    blurb: 'On write() vs fsync() and the lies storage tells.',
-    tilt: '-2.5deg',
-    dx: '0.5rem',
-    dy: '-0.75rem',
     pin: 'white',
   },
-  {
-    kind: 'article',
-    url: 'https://thebuild.com/blog/all-your-gucs-in-a-row-datasyncretry/',
-    title: 'All Your GUCs in a Row: data_sync_retry',
-    source: 'thebuild.com',
-    date: 'Jun 7, 2026',
-    blurb: 'The GUC that lets you shoot yourself in the foot.',
-    tilt: '1.5deg',
-    dx: '-0.25rem',
-    dy: '0.5rem',
-    pin: 'blue',
-    sealed: true,
-    quote:
-      "PostgreSQL's fsync() assumption once broke silently across every database in the world. Here's the scar tissue, and why crashing is the safe option.",
-  },
 ]
+
+/* the CASE FILE note is the hub every red thread runs through */
+const NOTE_INDEX = EXHIBITS.findIndex((e) => e.kind === 'note')
 
 /* ------------------------------------------------------------------ */
 /* iframe rendered at a phone viewport width, then scaled down to fit  */
@@ -291,10 +230,12 @@ const YELLOW_PAD: React.CSSProperties = {
   boxShadow: 'inset 0 0 26px rgba(150,110,30,0.22)',
 }
 
-/** per-card ink fade: how washed-out the printout looks at rest.
-    (index 4 is the case note — no fading there) */
-const INK_FADE = [0.88, 0.72, 0.9, 0.68, 1, 0.8, 0.66, 0.9, 0.74]
-const AGED_SEPIA = [0.45, 0.3, 0.5, 0.35, 0, 0.4, 0.3, 0.45, 0.35]
+/** per-card ink fade derived from the card's seed: how washed-out the
+    printout looks at rest (the case note gets no fading) */
+function inkAging(seed: number): { aged: number; ink: number } {
+  const rnd = mulberry32(seed * 613 + 99)
+  return { aged: 0.3 + rnd() * 0.2, ink: 0.65 + rnd() * 0.3 }
+}
 
 /* ------------------------------------------------------------------ */
 /* red thread — measured, not guessed                                 */
@@ -309,6 +250,13 @@ interface Measurements {
   pins: (PinPoint | null)[]
   width: number
   height: number
+}
+
+/** where a card landed on the board (set once, at random) */
+interface Placement {
+  x: number
+  y: number
+  tilt: number
 }
 
 /** one yarn connection: layered strokes for a twisted, textured cord */
@@ -350,14 +298,14 @@ function ThreadKnot({ p, big = false }: { p: PinPoint; big?: boolean }) {
 }
 
 function RedStrings({ m }: { m: Measurements }) {
-  // every thread runs from the center case-note pin (index 4) to a
-  // corner/edge pin, sagging toward gravity along the way
-  const center = m.pins[4]
+  // every thread runs from the case-note pin to the others, sagging
+  // toward gravity along the way
+  const center = m.pins[NOTE_INDEX]
   if (!center) return null
 
   const connections = m.pins
     .map((pin, i) => {
-      if (i === 4 || !pin) return null
+      if (i === NOTE_INDEX || !pin) return null
       const sag = 26 + (i % 3) * 15
       const mx = (center.x + pin.x) / 2
       const my = (center.y + pin.y) / 2 + sag
@@ -380,7 +328,7 @@ function RedStrings({ m }: { m: Measurements }) {
         <ThreadPath key={c.key} d={c.d} />
       ))}
       {m.pins.map((pin, i) =>
-        pin ? <ThreadKnot key={i} p={pin} big={i === 4} /> : null
+        pin ? <ThreadKnot key={i} p={pin} big={i === NOTE_INDEX} /> : null
       )}
     </svg>
   )
@@ -437,7 +385,7 @@ function CornerScrews() {
 }
 
 /* ------------------------------------------------------------------ */
-/* the case note (center of the board)                                 */
+/* the case note (hub of the red-thread web)                          */
 /* ------------------------------------------------------------------ */
 
 function CaseNote() {
@@ -475,23 +423,26 @@ function CaseNote() {
 function Clipping({
   exhibit,
   index,
+  pos,
   registerCard,
 }: {
   exhibit: Exhibit
   index: number
+  pos: Placement | null
   registerCard: (el: HTMLDivElement | null) => void
 }) {
-  const [loaded, setLoaded] = useState(false)
   const isNote = exhibit.kind === 'note'
   const seed = isNote ? 42 : index * 7 + 3
+  const aging = isNote ? { aged: 0, ink: 1 } : inkAging(seed)
 
   return (
     <div
-      className="group relative mt-8 w-60 cursor-pointer focus:outline-none"
-      style={{ marginLeft: exhibit.dx, marginTop: exhibit.dy }}
-      onMouseEnter={() => setLoaded(true)}
-      onFocus={() => setLoaded(true)}
-      onClick={() => setLoaded(true)}
+      className="group absolute w-60 cursor-pointer focus:outline-none"
+      style={{
+        left: pos?.x ?? 0,
+        top: pos?.y ?? 0,
+        visibility: pos ? 'visible' : 'hidden',
+      }}
     >
       {/* transform + z + drop-shadow wrapper: the shadow hugs the torn
           shape because the clip lives on the child */}
@@ -509,7 +460,7 @@ function Clipping({
           'hover:[transform:rotate(0deg)_scale(1.35)] focus:[transform:rotate(0deg)_scale(1.35)]',
           'hover:drop-shadow-[0_28px_50px_rgba(0,0,0,0.60)] focus:drop-shadow-[0_28px_50px_rgba(0,0,0,0.60)]'
         )}
-        style={{ '--tilt': exhibit.tilt } as React.CSSProperties}
+        style={{ '--tilt': `${pos?.tilt ?? 0}deg` } as React.CSSProperties}
       >
         {/* pin lives on the board layer, above the thread — see PinLayer */}
 
@@ -520,8 +471,8 @@ function Clipping({
             clipPath: tornPolygon(seed),
             ...(isNote ? YELLOW_PAD : agedPaper(seed)),
             // ink aging vars — consumed (and cleared on hover) by the child
-            '--aged': AGED_SEPIA[index] ?? 0.35,
-            '--ink': INK_FADE[index] ?? 0.85,
+            '--aged': aging.aged,
+            '--ink': aging.ink,
           } as React.CSSProperties}
         >
           {/* aged ink: sepia + faded, clears up under the hover "desk lamp" */}
@@ -591,31 +542,19 @@ function Clipping({
                     </a>
                   </div>
                 ) : (
-                  /* the live page at a phone viewport, lazily mounted */
+                  /* the live page at a phone viewport, loaded with the board */
                   <div className="relative h-72 border-t border-stone-400/40">
-                    {loaded ? (
-                      <iframe
-                        src={exhibit.url}
-                        title={exhibit.title}
-                        loading="lazy"
-                        className="absolute top-0 left-0 origin-top-left border-0"
-                        style={{
-                          width: `${PHONE_W}px`,
-                          height: `${PHONE_H}px`,
-                          transform: `scale(${SCALE})`,
-                        }}
-                      />
-                    ) : (
-                      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 px-5 text-center">
-                        <MousePointerClick
-                          className="size-5 text-stone-500 opacity-60 transition-opacity group-hover:opacity-0"
-                          aria-hidden="true"
-                        />
-                        <span className="font-serif text-xs leading-relaxed text-stone-600 italic transition-opacity group-hover:opacity-0">
-                          {exhibit.blurb}
-                        </span>
-                      </div>
-                    )}
+                    <iframe
+                      src={exhibit.url}
+                      title={exhibit.title}
+                      loading="lazy"
+                      className="absolute top-0 left-0 origin-top-left border-0"
+                      style={{
+                        width: `${PHONE_W}px`,
+                        height: `${PHONE_H}px`,
+                        transform: `scale(${SCALE})`,
+                      }}
+                    />
                   </div>
                 )}
               </>
@@ -631,10 +570,19 @@ function Clipping({
 /* the board                                                           */
 /* ------------------------------------------------------------------ */
 
+/** cork board height — the case note sits dead center with the six
+    clippings ringed around it */
+const CORK_H = 1180
+/** ring radii as fractions of the cork board — an ellipse, to match
+    the board's taller-than-wide frame */
+const RING_RX = 0.28
+const RING_RY = 0.28
+
 export default function FsyncgateCollage() {
   const corkRef = useRef<HTMLDivElement | null>(null)
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
   const [m, setM] = useState<Measurements | null>(null)
+  const [placements, setPlacements] = useState<Placement[] | null>(null)
 
   // pin center = top edge of each card, horizontally centered (that's
   // exactly where the DOM pushpin sits: -top-2.5 with size-5 → centered
@@ -654,8 +602,49 @@ export default function FsyncgateCollage() {
     setM({ pins, width: corkRect.width, height: corkRect.height })
   }, [])
 
+  // the case note sits dead center; the six clippings hang in a ring
+  // around it. the ring gets a random starting angle and each card a
+  // random tilt, so no two loads pin them quite the same way.
   useLayoutEffect(() => {
-    measure()
+    const cork = corkRef.current
+    if (!cork) return
+    const corkRect = cork.getBoundingClientRect()
+    const cx = corkRect.width / 2
+    const cy = corkRect.height / 2
+    const rx = corkRect.width * RING_RX
+    const ry = corkRect.height * RING_RY
+    const ringCount = EXHIBITS.length - 1
+    const phase = Math.random() * Math.PI * 2
+    const jitter = () => Math.random() * 16 - 8
+    let ring = 0
+    const next: Placement[] = cardsRef.current.map((card, i) => {
+      const r = card?.getBoundingClientRect()
+      const w = r?.width ?? 0
+      const h = r?.height ?? 0
+      let x: number
+      let y: number
+      if (i === NOTE_INDEX) {
+        // the hub — dead center, no jitter
+        x = cx - w / 2
+        y = cy - h / 2
+      } else {
+        const angle = phase + (ring++ * Math.PI * 2) / ringCount
+        x = cx + rx * Math.cos(angle) - w / 2
+        y = cy + ry * Math.sin(angle) - h / 2
+        x += jitter()
+        y += jitter()
+      }
+      return { x, y, tilt: +(Math.random() * 7 - 3.5).toFixed(1) }
+    })
+    setPlacements(next)
+  }, [])
+
+  // once the cards have landed, locate the pins
+  useLayoutEffect(() => {
+    if (placements) measure()
+  }, [placements, measure])
+
+  useLayoutEffect(() => {
     const cork = corkRef.current
     if (!cork) return
     const ro = new ResizeObserver(() => measure())
@@ -676,28 +665,31 @@ export default function FsyncgateCollage() {
         <div className="relative min-w-[820px] rounded-2xl p-4 dark:brightness-[0.82]" style={WOOD_FRAME}>
           <CornerScrews />
           {/* green cork board */}
-          <div ref={corkRef} className="relative rounded-lg p-6" style={GREEN_CORK}>
+          <div
+            ref={corkRef}
+            className="relative rounded-lg p-6"
+            style={{ ...GREEN_CORK, height: CORK_H }}
+          >
             {m && <RedStrings m={m} />}
             {m && <PinLayer m={m} />}
-            {/* 3×3 grid of overlapping exhibits */}
-            <div className="relative grid grid-cols-3 items-start justify-items-center">
-              {EXHIBITS.map((exhibit, i) => (
-                <Clipping
-                  key={exhibit.url}
-                  exhibit={exhibit}
-                  index={i}
-                  registerCard={(el) => {
-                    cardsRef.current[i] = el
-                  }}
-                />
-              ))}
-            </div>
+            {/* the case note at the hub, clippings ringed around it */}
+            {EXHIBITS.map((exhibit, i) => (
+              <Clipping
+                key={exhibit.url}
+                exhibit={exhibit}
+                index={i}
+                pos={placements?.[i] ?? null}
+                registerCard={(el) => {
+                  cardsRef.current[i] = el
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
       <p className="mt-2 text-center font-mono text-xs tracking-wide text-zinc-500 dark:text-zinc-400">
-        the evidence board · six clippings are the live pages (mobile edition) · two refuse to
-        be framed · hover to pop one out
+        the evidence board · six clippings are the live pages (mobile edition) · hover to pop
+        one out
       </p>
       <p className="mt-1 font-mono text-[10px] text-zinc-400 sm:hidden dark:text-zinc-500">
         ← drag sideways to see the whole board →
