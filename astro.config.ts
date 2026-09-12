@@ -23,6 +23,11 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   site: 'https://faraazahmad.github.io/',
   base: 'blog',
+  // The glob loader now honors the `slug` frontmatter, so this post moved from
+  // /blog/more-efficient-coding-agent to /blog/efficient-coding-agent.
+  redirects: {
+    '/blog/more-efficient-coding-agent': '/blog/blog/efficient-coding-agent',
+  },
   image: { service: passthroughImageService() },
   integrations: [
     expressiveCode({
@@ -73,6 +78,12 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Keep `@layer` order statements in the bundled CSS. The default minifier
+      // strips them, which lets Tailwind's preflight override the `.prose`
+      // component styles depending on CSS chunk order.
+      cssMinify: false,
+    },
   },
   server: {
     port: 1234,
