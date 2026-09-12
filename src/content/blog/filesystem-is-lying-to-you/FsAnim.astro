@@ -1,0 +1,967 @@
+---
+/**
+ * Replayable CSS animations for "Your filesystem is lying to you".
+ * Renders one of three numbered scenario animations:
+ *   1 — fsync() blames the wrong transaction
+ *   2 — the error arrives after everyone has gone home
+ *   3 — an innocent process gets blamed
+ *
+ * All motion is pure CSS keyframes, sequenced with per-element delays.
+ * The `playing` class (toggled by the replay button / IntersectionObserver)
+ * drives every animation, so replay = remove class, reflow, re-add class.
+ */
+interface Props {
+  scenario: 1 | 2 | 3
+}
+
+const { scenario } = Astro.props
+
+const titles: Record<number, string> = {
+  1: 'fsync() blames the wrong transaction',
+  2: 'the error arrives after everyone has gone home',
+  3: 'an innocent process gets blamed',
+}
+---
+
+<section class={`fs-anim s${scenario}`}>
+  <div class="fs-anim-head">
+    <span class="fs-anim-title">
+      {titles[scenario]}
+    </span>
+    <button class="fs-anim-replay" type="button">Replay</button>
+  </div>
+
+  <div class="fs-scroll">
+    <div class={`fs-canvas h${scenario}`}>
+      <div class="lane app"><span>program</span></div>
+      <div class="lane mid"><span>page cache</span></div>
+      <div class="lane disk"><span>disk · WAL</span></div>
+
+      <div class="hint">press ▶ Play to run the scenario</div>
+
+      {
+        scenario === 1 && (
+          <>
+            <div
+              class="el bank pop pulse"
+              style="left:72%;top:76px;--ad:.1s;--pd:9.3s"
+            >
+              BANK
+            </div>
+            <div
+              class="el proc pop fade-out"
+              style="left:8%;top:76px;--ad:.4s;--fd:17.4s"
+            >
+              process 1 — payment gateway
+            </div>
+
+            <div class="el call pop" style="left:8%;top:132px;--ad:1.2s">
+              write(tx 101) · <b>$50,000</b>
+            </div>
+            <div
+              class="el tx fly"
+              style="--ad:2.4s;--adur:1.8s;--fx:10%;--fy:220px;--tx:44%;--ty:220px"
+            >
+              tx 101
+            </div>
+            <div class="el call pop" style="left:8%;top:280px;--ad:4.8s">
+              fsync(tx 101)
+            </div>
+            <div class="el ret ok pop" style="left:8%;top:328px;--ad:6.3s">
+              returns 0 ✓
+            </div>
+
+            <div
+              class="el money fly"
+              style="--ad:7.2s;--adur:2s;--fx:10%;--fy:376px;--tx:66%;--ty:106px"
+            >
+              $50,000 wired
+            </div>
+
+            <div
+              class="el dot fly"
+              style="--ad:8.6s;--adur:1.5s;--fx:46%;--fy:232px;--tx:76%;--ty:232px"
+            />
+            <div
+              class="el xmark pop shake"
+              style="left:72%;top:214px;--ad:10.2s"
+            >
+              ✕ write failed (injected)
+            </div>
+            <div class="el fnote pop" style="left:41%;top:260px;--ad:10.8s">
+              tx 101 never reached disk
+            </div>
+
+            <div class="el call pop" style="left:8%;top:424px;--ad:11.6s">
+              write(tx 102) · <b>$30,000</b>
+            </div>
+            <div
+              class="el tx fly"
+              style="--ad:11.9s;--adur:1.5s;--fx:10%;--fy:462px;--tx:44%;--ty:344px"
+            >
+              tx 102
+            </div>
+            <div class="el call pop" style="left:8%;top:508px;--ad:13.6s">
+              fsync(tx 102)
+            </div>
+            <div
+              class="el ret err pop shake"
+              style="left:8%;top:560px;--ad:15.2s"
+            >
+              returns EIO — abort tx 102
+            </div>
+
+            <div class="crash" style="--ad:17s">POWER CUT</div>
+            <div class="el recover pop" style="left:70%;top:300px;--ad:18s">
+              recovery: valid records = 0
+            </div>
+            <div class="el verdict pop" style="--ad:18.8s">
+              $50,000 left the bank — the WAL says: “what $50,000?”
+            </div>
+
+            <div class="reduced-summary">
+              <ol>
+                <li>Process 1 writes <b>tx 101 ($50,000)</b> to the WAL.</li>
+                <li><code>fsync(tx 101)</code> returns <b>0</b> — process 1 wires $50,000.</li>
+                <li>The writeback silently fails — tx 101 never reaches disk.</li>
+                <li>Process 1 writes <b>tx 102 ($30,000)</b>.</li>
+                <li><code>fsync(tx 102)</code> returns <b>EIO</b> — process 1 aborts tx 102.</li>
+                <li>After a crash, recovery finds <b>zero valid records</b>.</li>
+                <li>The WAL says “what $50,000?” — but the money was already sent.</li>
+              </ol>
+            </div>
+          </>
+        )
+      }
+
+      {
+        scenario === 2 && (
+          <>
+            <div
+              class="el bank pop pulse"
+              style="left:72%;top:76px;--ad:.1s;--pd:8.9s"
+            >
+              BANK
+            </div>
+            <div
+              class="el proc pop fade-out"
+              style="left:8%;top:76px;--ad:.4s;--fd:12.2s"
+            >
+              process 1 — payment gateway
+            </div>
+
+            <div class="el call pop" style="left:8%;top:132px;--ad:1.2s">
+              write(tx 201) · <b>$70,000</b>
+            </div>
+            <div
+              class="el tx fly"
+              style="--ad:2.6s;--adur:1.8s;--fx:10%;--fy:220px;--tx:44%;--ty:220px"
+            >
+              tx 201
+            </div>
+            <div class="el call pop" style="left:8%;top:280px;--ad:5s">
+              fsync(tx 201)
+            </div>
+            <div class="el ret ok pop" style="left:8%;top:328px;--ad:6.2s">
+              returns 0 ✓
+            </div>
+
+            <div
+              class="el money fly"
+              style="--ad:7s;--adur:1.8s;--fx:10%;--fy:376px;--tx:66%;--ty:106px"
+            >
+              $70,000 wired
+            </div>
+
+            <div
+              class="el dot fly"
+              style="--ad:8.2s;--adur:1.5s;--fx:46%;--fy:232px;--tx:76%;--ty:232px"
+            />
+            <div
+              class="el xmark pop shake"
+              style="left:72%;top:214px;--ad:9.9s"
+            >
+              ✕ writeback failed (later)
+            </div>
+            <div class="el fnote pop" style="left:41%;top:260px;--ad:10.5s">
+              tx 201 never reached disk
+            </div>
+
+            <div class="el exit-chip pop" style="left:8%;top:424px;--ad:11.3s">
+              process exits cleanly ✓
+            </div>
+            <div
+              class="el eio-bubble pop wobble bubble-out"
+              style="left:63%;top:254px;--ad:12.8s;--bd:15.2s"
+            >
+              EIO … anyone? …anyone?
+            </div>
+
+            <div class="crash" style="--ad:16.4s">FILESYSTEM REMOUNT</div>
+            <div class="el recover pop" style="left:70%;top:300px;--ad:17.4s">
+              recovery: valid records = 0
+            </div>
+            <div class="el verdict pop" style="--ad:18.4s">
+              $70,000 gone · clean exit · empty WAL — nobody was left to see
+              the error
+            </div>
+
+            <div class="reduced-summary">
+              <ol>
+                <li>Process 1 writes <b>tx 201 ($70,000)</b> to the WAL.</li>
+                <li><code>fsync(tx 201)</code> returns <b>0</b> — process 1 wires $70,000.</li>
+                <li>Process 1 exits cleanly.</li>
+                <li>The writeback silently fails — tx 201 never reached disk.</li>
+                <li>The EIO is detected during filesystem shutdown — but no one is left to receive it.</li>
+                <li>After remount, recovery finds <b>zero valid records</b>.</li>
+                <li>$70,000 was sent — the WAL is empty — and nobody saw the error.</li>
+              </ol>
+            </div>
+          </>
+        )
+      }
+
+      {
+        scenario === 3 && (
+          <>
+            <div
+              class="el bank pop pulse"
+              style="left:72%;top:76px;--ad:.1s;--pd:8.9s"
+            >
+              BANK
+            </div>
+            <div
+              class="el proc pop fade-out"
+              style="left:8%;top:76px;--ad:.4s;--fd:11.6s"
+            >
+              process 1 — payment gateway
+            </div>
+            <div class="el walfile pop" style="left:70%;top:254px;--ad:.7s">
+              WAL file (shared)
+            </div>
+
+            <div class="el call pop" style="left:8%;top:132px;--ad:1.2s">
+              write(tx 301) · <b>$80,000</b>
+            </div>
+            <div
+              class="el tx fly"
+              style="--ad:2.6s;--adur:1.8s;--fx:10%;--fy:220px;--tx:44%;--ty:220px"
+            >
+              tx 301
+            </div>
+            <div class="el call pop" style="left:8%;top:280px;--ad:5s">
+              fsync(tx 301)
+            </div>
+            <div class="el ret ok pop" style="left:8%;top:328px;--ad:6.2s">
+              returns 0 ✓
+            </div>
+
+            <div
+              class="el money fly"
+              style="--ad:7s;--adur:1.8s;--fx:10%;--fy:376px;--tx:66%;--ty:106px"
+            >
+              $80,000 wired
+            </div>
+
+            <div
+              class="el dot fly"
+              style="--ad:8.2s;--adur:1.5s;--fx:46%;--fy:232px;--tx:76%;--ty:232px"
+            />
+            <div
+              class="el xmark pop shake"
+              style="left:72%;top:214px;--ad:9.9s"
+            >
+              ✕ writeback failed
+            </div>
+            <div class="el deferred pop wobble"
+              style="left:70%;top:292px;--ad:13.6s"
+            >
+              pending EIO — parked on the WAL
+            </div>
+
+            <div class="el exit-chip pop" style="left:8%;top:424px;--ad:11.3s">
+              process 1 exits ✓
+            </div>
+
+            <div
+              class="el proc pop shake-late"
+              style="left:8%;top:470px;--ad:12.2s;--sd:16.2s"
+            >
+              process 2 — unrelated program
+            </div>
+            <div class="el call pop" style="left:8%;top:518px;--ad:13s">
+              open(WAL) · writes NOTHING
+            </div>
+            <div class="el call pop" style="left:8%;top:564px;--ad:14.2s">
+              fsync(WAL)
+            </div>
+
+            <div
+              class="el ret err fly"
+              style="--ad:15s;--adur:1.6s;--fx:70%;--fy:268px;--tx:11%;--ty:482px"
+            >
+              EIO
+            </div>
+            <div class="el blame pop" style="left:36%;top:480px;--ad:17.4s">
+              “why me?! I wrote nothing”
+            </div>
+
+            <div class="el verdict pop" style="--ad:18.2s">
+              tx 301’s writeback error was delivered to process 2 — the
+              innocent bystander
+            </div>
+
+            <div class="reduced-summary">
+              <ol>
+                <li>Process 1 writes <b>tx 301 ($80,000)</b> to the shared WAL file.</li>
+                <li><code>fsync(tx 301)</code> returns <b>0</b> — process 1 wires $80,000.</li>
+                <li>Process 1 exits.</li>
+                <li>Process 2 opens the same WAL file, writes nothing.</li>
+                <li>The deferred writeback failure from tx 301 is recorded on the WAL.</li>
+                <li>Process 2 calls <code>fsync(WAL)</code> — receives <b>EIO</b>.</li>
+                <li>An innocent process gets blamed for a failure it didn't cause.</li>
+              </ol>
+            </div>
+          </>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .fs-anim {
+    --ok: #16a34a;
+    --bad: #dc2626;
+    --warn: #d97706;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--background);
+    font-size: 12.5px;
+    overflow: hidden;
+  }
+
+  :global(.dark) .fs-anim {
+    --ok: #4ade80;
+    --bad: #f87171;
+    --warn: #fbbf24;
+  }
+
+  /* ---------- header ---------- */
+
+  .fs-anim-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--secondary) 40%, transparent);
+  }
+
+  .fs-anim-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: monospace;
+    color: var(--foreground);
+  }
+
+  .fs-anim-num {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--destructive);
+    color: oklch(0.985 0 0);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .fs-anim-replay {
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--background);
+    color: var(--foreground);
+    padding: 0.25rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: background 0.15s ease;
+  }
+
+  .fs-anim-replay:hover {
+    background: color-mix(in oklab, var(--secondary) 70%, transparent);
+  }
+
+  /* ---------- stage ---------- */
+
+  .fs-canvas {
+    position: relative;
+    width: 100%;
+  }
+
+  .h1 {
+    height: 660px;
+  }
+  .h2 {
+    height: 500px;
+  }
+  .h3 {
+    height: 660px;
+  }
+
+  .lane {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    border: 1px dashed color-mix(in oklab, var(--border) 100%, transparent);
+    border-radius: 0.75rem;
+  }
+
+  .lane span {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    padding: 2px 8px;
+    border-radius: 0.5rem;
+    background: color-mix(in oklab, var(--secondary) 55%, transparent);
+    color: var(--muted-foreground);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    /* events start below this heading badge (~76px from canvas top) */
+  }
+
+  .lane.app {
+    left: 2%;
+    width: 28%;
+  }
+  .lane.mid {
+    left: 36%;
+    width: 28%;
+  }
+  .lane.disk {
+    left: 70%;
+    width: 28%;
+  }
+
+  .hint {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--muted-foreground);
+    font-style: italic;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .fs-anim.playing .hint {
+    opacity: 0;
+  }
+
+  .fs-anim.playing.paused .el,
+  .fs-anim.playing.paused .crash {
+    animation-play-state: paused !important;
+  }
+
+  /* ---------- elements ---------- */
+
+  .el {
+    position: absolute;
+    z-index: 2;
+    padding: 4px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    opacity: 0;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 12%, transparent);
+  }
+
+  .call {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  }
+
+  .call b {
+    color: var(--warn);
+  }
+
+  .proc {
+    font-weight: 600;
+    background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  }
+
+  .bank {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  }
+
+  .tx {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    border-style: dashed;
+    border-color: var(--warn);
+    color: var(--warn);
+    background: color-mix(in oklab, var(--warn) 8%, var(--background));
+  }
+
+  .ret.ok {
+    border-color: var(--ok);
+    color: var(--ok);
+    font-weight: 600;
+    background: color-mix(in oklab, var(--ok) 8%, var(--background));
+  }
+
+  .ret.err,
+  .err {
+    border-color: var(--bad);
+    color: var(--bad);
+    font-weight: 700;
+    background: color-mix(in oklab, var(--bad) 8%, var(--background));
+  }
+
+  .money {
+    border-color: var(--ok);
+    color: var(--ok);
+    font-weight: 700;
+    background: color-mix(in oklab, var(--ok) 10%, var(--background));
+  }
+
+  .xmark {
+    border-color: var(--bad);
+    color: var(--bad);
+    font-weight: 700;
+    background: color-mix(in oklab, var(--bad) 10%, var(--background));
+  }
+
+  .fnote {
+    border-style: dashed;
+    border-color: var(--bad);
+    color: var(--bad);
+    font-size: 11.5px;
+    background: color-mix(in oklab, var(--bad) 6%, var(--background));
+  }
+
+  .exit-chip {
+    color: var(--muted-foreground);
+    font-size: 11.5px;
+    border-style: dashed;
+  }
+
+  .eio-bubble {
+    border-radius: 999px;
+    border-color: var(--bad);
+    border-style: dashed;
+    color: var(--bad);
+    font-style: italic;
+    background: color-mix(in oklab, var(--bad) 6%, var(--background));
+  }
+
+  .walfile {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  }
+
+  .deferred {
+    border-color: var(--warn);
+    color: var(--warn);
+    font-size: 11.5px;
+    font-weight: 600;
+    background: color-mix(in oklab, var(--warn) 8%, var(--background));
+  }
+
+  .blame {
+    color: var(--foreground);
+    font-style: italic;
+    background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: var(--muted-foreground);
+    box-shadow: none;
+  }
+
+  .recover {
+    z-index: 6;
+    border-color: var(--destructive);
+    font-weight: 600;
+    background: color-mix(in oklab, var(--destructive) 8%, var(--background));
+  }
+
+  .verdict {
+    left: 2%;
+    right: 2%;
+    top: auto;
+    bottom: 12px;
+    z-index: 6;
+    font-weight: 600;
+    text-align: center;
+    border-color: var(--destructive);
+    background: color-mix(in oklab, var(--destructive) 10%, var(--background));
+  }
+
+  .crash {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    border-radius: 0.75rem;
+    opacity: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: oklch(0.985 0 0);
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in oklab, var(--destructive) 55%, transparent),
+      color-mix(in oklab, var(--destructive) 55%, transparent) 14px,
+      color-mix(in oklab, var(--destructive) 38%, transparent) 14px,
+      color-mix(in oklab, var(--destructive) 38%, transparent) 28px
+    );
+    text-shadow: 0 2px 8px oklch(0 0 0 / 0.6);
+    pointer-events: none;
+  }
+
+  /* ---------- animations (only run while .playing) ---------- */
+
+  @keyframes fsPop {
+    0% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    60% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fsFly {
+    0% {
+      left: var(--fx);
+      top: var(--fy);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      left: var(--tx);
+      top: var(--ty);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fsPulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.14);
+      box-shadow: 0 0 0 6px color-mix(in oklab, var(--ok) 25%, transparent);
+    }
+  }
+
+  @keyframes fsShake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-5px);
+    }
+    40% {
+      transform: translateX(5px);
+    }
+    60% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(3px);
+    }
+  }
+
+  @keyframes fsWobble {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-6px) rotate(-1.5deg);
+    }
+  }
+
+  @keyframes fsBubbleOut {
+    to {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.8);
+    }
+  }
+
+  @keyframes fsFadeOut {
+    0% {
+      opacity: 1;
+      filter: none;
+    }
+    100% {
+      opacity: 0;
+      filter: grayscale(1);
+      transform: translateY(-8px) scale(0.92);
+    }
+  }
+
+  @keyframes fsFlash {
+    0% {
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    16% {
+      opacity: 0.7;
+    }
+    24% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0.92;
+    }
+  }
+
+  .fs-anim.playing .pop {
+    animation: fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both
+      var(--ad, 0s);
+  }
+
+  .fs-anim.playing .pop.pulse {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsPulse 1s ease both var(--pd, 8s);
+  }
+
+  .fs-anim.playing .pop.shake {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsShake 0.7s ease both calc(var(--ad, 0s) + 0.6s);
+  }
+
+  .fs-anim.playing .pop.shake-late {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsShake 0.8s ease both var(--sd, 16s);
+  }
+
+  .fs-anim.playing .pop.wobble {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsWobble 1.4s ease-in-out 3 calc(var(--ad, 0s) + 0.6s);
+  }
+
+  .fs-anim.playing .pop.wobble.bubble-out {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsWobble 1.4s ease-in-out 3 calc(var(--ad, 0s) + 0.6s),
+      fsBubbleOut 1.3s ease both var(--bd, 15s);
+  }
+
+  .fs-anim.playing .fly {
+    animation: fsFly var(--adur, 1.6s) ease-in-out both var(--ad, 0s);
+  }
+
+  .fs-anim.playing .fade-out {
+    animation:
+      fsPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both var(--ad, 0s),
+      fsFadeOut 1.4s ease both var(--fd, 12s);
+  }
+
+  .fs-anim.playing .crash {
+    animation: fsFlash 1.2s ease both var(--ad, 0s);
+  }
+
+  /* ---------- reduced motion ---------- */
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-canvas .el,
+    .fs-canvas .crash,
+    .fs-canvas .lane,
+    .fs-canvas .hint {
+      display: none;
+    }
+    .reduced-summary {
+      display: block;
+      padding: 1.25rem 1.5rem;
+    }
+    .fs-anim-replay {
+      display: none;
+    }
+    .fs-anim-head {
+      border-bottom: none;
+    }
+  }
+
+  .reduced-summary {
+    display: none;
+  }
+
+  .reduced-summary ol {
+    margin: 0;
+    padding-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    list-style: decimal;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--foreground);
+  }
+
+  .reduced-summary li {
+    padding: 0.15rem 0;
+  }
+
+  .reduced-summary b {
+    color: var(--warn);
+  }
+
+  .reduced-summary code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: color-mix(in oklab, var(--secondary) 55%, transparent);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* ---------- mobile ---------- */
+
+  @media (max-width: 640px) {
+    .fs-scroll {
+      overflow-x: hidden;
+    }
+    .fs-canvas {
+      min-width: unset;
+    }
+    .fs-canvas .el,
+    .fs-canvas .crash,
+    .fs-canvas .lane,
+    .fs-canvas .hint {
+      display: none;
+    }
+    .reduced-summary {
+      display: block;
+      padding: 1rem 1.25rem;
+    }
+    .fs-anim.playing .hint {
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  function setupFsAnim(anim: Element) {
+    const canvas = anim.querySelector('.fs-canvas') as HTMLElement | null
+    const btn = anim.querySelector('.fs-anim-replay') as HTMLButtonElement | null
+    const verdict = anim.querySelector('.verdict') as HTMLElement | null
+    if (!canvas || !btn) return
+
+    interface State {
+      label: string
+      action(this: HTMLButtonElement): void
+    }
+
+    const states: Record<string, State> = {
+      idle: {
+        label: 'Play',
+        action() {
+          set('playing')
+          anim.classList.add('playing')
+        },
+      },
+      playing: {
+        label: 'Pause',
+        action() {
+          set('paused')
+          anim.classList.add('paused')
+        },
+      },
+      paused: {
+        label: 'Resume',
+        action() {
+          anim.classList.remove('paused')
+          set('playing')
+        },
+      },
+      done: {
+        label: '↻ Replay',
+        action() {
+          anim.classList.remove('playing', 'paused', 'done')
+          // force style recalc so removing/adding the class restarts
+          void canvas.offsetWidth
+          anim.classList.add('playing')
+          set('playing')
+        },
+      },
+    }
+
+    function set(state: string) {
+      const s = states[state]
+      if (!s) return
+      btn!.textContent = s.label
+      btn!.dataset.state = state
+    }
+
+    btn.addEventListener('click', function (this: HTMLButtonElement) {
+      const state = this.dataset.state || 'idle'
+      states[state]?.action.call(this)
+    })
+
+    // Detect when the final verdict has appeared (animation complete)
+    if (verdict) {
+      verdict.addEventListener('animationend', () => {
+        if (!anim.classList.contains('paused')) {
+          anim.classList.add('done')
+          set('done')
+        }
+      })
+    }
+
+    // Also mark done if the crash overlay finishes (scenarios 1 & 2)
+    const crash = anim.querySelector('.crash') as HTMLElement | null
+    if (crash) {
+      crash.addEventListener('animationend', () => {
+        if (!anim.classList.contains('paused') && !anim.classList.contains('done')) {
+          anim.classList.add('done')
+          set('done')
+        }
+      })
+    }
+
+    // Initial label
+    set('idle')
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('.fs-anim:not([data-fsanim])').forEach((el) => {
+      el.setAttribute('data-fsanim', '')
+      setupFsAnim(el)
+    })
+  })
+</script>

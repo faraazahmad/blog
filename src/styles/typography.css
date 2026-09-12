@@ -119,4 +119,42 @@
       @apply my-6 overflow-x-auto overflow-y-hidden py-2 tracking-normal;
     }
   }
+
+  /* Inline note that moves into the right margin on large screens */
+  .margin-note {
+    @apply hidden my-6 pl-10;
+    font-family: 'Caveat', cursive;
+    transform: rotate(-1.5deg) skewX(-1deg);
+  }
+
+  .margin-note p,
+  .margin-note strong {
+    @apply text-teal-700;
+  }
+
+  .dark .margin-note p {
+      @apply text-teal-400;
+  }
+
+
+  .margin-note p {
+    @apply my-0;
+  }
+
+  @media (min-width: 1536px) {
+    .margin-note {
+        @apply block;
+      float: right;
+      clear: right;
+      width: 25rem;
+      margin: 0.15rem calc(-25rem - 2rem) 0 0;
+      padding-left: 1rem;
+    }
+
+    .margin-note p {
+      @apply leading-6;
+      font-size: 1.75rem;
+      line-height: 2.25rem;
+    }
+  }
 }
