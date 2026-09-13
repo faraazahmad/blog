@@ -1,0 +1,90 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Patrika — Site Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# This file lives alongside your content in your Obsidian vault.
+# Only include the fields you want to override.
+# Defaults are defined in src/config/site.config.ts
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Site identity ─────────────────────────────────────────────────────────────
+- id: config
+  title: Faraaz's Blog
+  description: Essays on software, systems, AI, and building things.
+  url: https://faraazahmad.github.io/blog
+  locale: en-US
+
+  # ── Author ────────────────────────────────────────────────────────────────────
+
+  author:
+    name: Syed Faraaz Ahmad
+    bio: Software engineer interested in Ruby, Elixir, distributed systems, and programming language internals.
+    url: https://faraazahmad.github.io
+    avatar: https://avatars.githubusercontent.com/u/19265077?v=4
+
+  # ── Assets ───────────────────────────────────────────────────────────────────
+  # Uncomment to use a logo or custom OG image.
+  # Paths are relative to /public
+
+  logo: /images/logo.svg
+  ogImage: /images/twitter-card.png
+
+  # ── Navigation ────────────────────────────────────────────────────────────────
+  # Top navigation links. Order here is order in the nav bar.
+
+  navigation:
+    - title: Articles
+      url: /posts
+    - title: Archive
+      url: /archive
+
+  # ── Footer links ──────────────────────────────────────────────────────────────
+
+  footerLinks:
+    - title: RSS
+      url: /rss.xml
+
+  # ── Social ────────────────────────────────────────────────────────────────────
+  # Supported icons: github, mastodon, twitter, rss, email
+
+  social:
+    - title: GitHub
+      url: https://github.com/faraazahmad
+      icon: github
+    - title: Twitter
+      url: https://twitter.com/Faraaz98
+      icon: twitter
+    - title: Email
+      url: mailto:faraaz98@live.com
+      icon: email
+    - title: RSS
+      url: /rss.xml
+      icon: rss
+
+  # ── Content display ───────────────────────────────────────────────────────────
+
+  # Shown as the opening line on the garden homepage
+  heroText: Essays on software, systems, AI, and building things.
+
+  # Shown in the footer (optional — remove the line to hide)
+  footerCredits: ""  # ← replace with your tagline, or delete this line
+
+  # Number of posts shown per archive page
+  postsPerPage: 8
+
+  # Number of recent entries shown on the homepage
+  recentPosts: 4
+
+  # ── Flags ─────────────────────────────────────────────────────────────────────
+
+  # Set to true if you have a logo defined above
+  showLogo: true
+
+  # ── Browse ────────────────────────────────────────────────────────────────────
+  # Generic index pages built from an optional `meta` object in post/note
+  # frontmatter. Each entry below turns `meta.<key>` into a browsable
+  # dimension at /browse/<slug>. Unconfigured meta keys are ignored.
+  # `slug` must not be "years" (that path is reserved for the date index).
+
+  browse:
+    years: true
+    indexes: []

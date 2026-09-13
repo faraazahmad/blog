@@ -1,0 +1,14 @@
+---
+import "@fontsource-variable/caveat"
+
+interface Props {
+  title?: string
+}
+
+const { title } = Astro.props
+---
+
+<aside class="margin-note translate-6">
+  {title && <strong class="mb-1 block">{title}</strong>}
+  <slot />
+</aside>
