@@ -10,6 +10,8 @@ type Props = {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   type?: "website" | "article";
   activePath?: string;
 };
@@ -20,6 +22,8 @@ const {
   title,
   description = siteConfig.description,
   ogImage,
+  ogImageWidth = 1200,
+  ogImageHeight = 630,
   type = "website",
   activePath = Astro.url.pathname,
 } = Astro.props;
@@ -51,8 +55,8 @@ const ogImageUrl = absoluteUrl(ogImage ?? getOgImagePath(activePath), Astro.site
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content={ogImageWidth} />
+    <meta property="og:image:height" content={ogImageHeight} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />

@@ -7,6 +7,7 @@ function isExternal(path: string): boolean {
 
 export function getAssetPath(path: string): string {
   if (isExternal(path)) return path;
+  if (base && (path === base || path.startsWith(`${base}/`))) return path;
 
   const normalized = path.replace(/^\/+/, "");
 
